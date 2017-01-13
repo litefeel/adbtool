@@ -23,7 +23,7 @@ def listOneItem(arr, index):
     return None
 
 def getDevices():
-    output, isOk = call('"%s" devices -l' % getAdb())
+    output, isOk = call('%s devices -l' % getAdb())
     devices = []
     if isOk:
         output = output.replace('\r\n', '\n').strip()
@@ -44,9 +44,7 @@ def getDevicesBySerial(devices, serial):
 #         3. not filter but has more than devices
 #   Empty List: can not match devices
 #   List: matched devices
-def filterDevices(args):
-    devices = getDevices()
-
+def filterDevices(devices, args):
     if len(devices) == 0:
         print('No devices connected')
         return None
@@ -104,7 +102,7 @@ def doArgumentParser(args):
         printDevices(devices)
         return (True, None)
 
-    devices = filterDevices(args.devices)
+    devices = filterDevices(devices, args.devices)
     serials = getSerials(devices)
     return (False, serials)
 
@@ -124,5 +122,5 @@ if __name__ == '__main__':
         printDevices(getDevices())
         exit(0)
 
-    devices = filterDevices(args.devices)
+    devices = filterDevices(getDevices(), args.devices)
     printDevices(devices)

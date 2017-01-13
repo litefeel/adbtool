@@ -48,7 +48,7 @@ def install(apks, serials):
     adb = getAdb()
     for apk in apks:
         for serial in serials:
-            cmd = '"%s" -s %s install -r "%s"' % (adb, serial, apk)
+            cmd = '%s -s %s install -r "%s"' % (adb, serial, apk)
             call(cmd, True)
 
 
