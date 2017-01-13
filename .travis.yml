@@ -1,0 +1,59 @@
+language: android
+sudo: required
+python:
+  - "2.6"
+  - "2.7"
+  - "3.2"
+  - "3.3"
+  - "3.4"
+  - "3.5"
+  - "3.5-dev" # 3.5 development branch
+  - "3.6-dev" # 3.6 development branch
+  - "nightly" # currently points to 3.7-dev
+
+env:
+  - USE_PY3=0 
+  - USE_PY3=1 
+
+android:
+  components:
+    # Uncomment the lines below if you want to
+    # use the latest revision of Android SDK Tools
+    # - platform-tools
+    # - tools
+
+    # The BuildTools version used by your project
+    # - build-tools-19.1.0
+
+    # The SDK version used to compile your project
+    - android-22
+
+    # Additional components
+    # - extra-google-google_play_services
+    # - extra-google-m2repository
+    # - extra-android-m2repository
+    # - addon-google_apis-google-19
+
+    # Specify at least one system image,
+    # if you need to run emulator(s) during your tests
+    - sys-img-armeabi-v7a-android-22
+    # - sys-img-armeabi-v7a-android-17
+
+
+# Emulator Management: Create, Start and Wait
+before_script:
+  - sudo apt-get update
+  - test $USE_PY3 -eq 1 && sudo apt-get install python3 || true
+  - echo no | android create avd --force -n test -t android-22 --abi armeabi-v7a
+  - emulator -avd test -no-audio -no-window &
+  - android-wait-for-emulator
+  # - adb shell input keyevent 82 &
+
+script:
+  - chmod +x -R .
+  - ls -lha /usr/local/android-sdk/platform-tools
+  - ./adbdevice.py -l
+  - ./adbdevice.py -h
+  - ./adbpush.py -h
+  - ./apkinstall.py -h
+  - ./apkinstall.py test/adbtooltest.apk
