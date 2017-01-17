@@ -1,19 +1,15 @@
 language: android
 sudo: required
-python:
-  - "2.6"
-  - "2.7"
-  - "3.2"
-  - "3.3"
-  - "3.4"
-  - "3.5"
-  - "3.5-dev" # 3.5 development branch
-  - "3.6-dev" # 3.6 development branch
-  - "nightly" # currently points to 3.7-dev
 
 env:
-  - USE_PY3=0 
-  - USE_PY3=1 
+  - PYVER=2.7.3 
+  - PYVER=3.0 
+  - PYVER=3.1 
+  - PYVER=3.2 
+  - PYVER=3.3.0 
+  - PYVER=3.4.0 
+  - PYVER=3.5.0 
+  - PYVER=3.6.0 
 
 android:
   components:
@@ -38,18 +34,35 @@ android:
     # if you need to run emulator(s) during your tests
     - sys-img-armeabi-v7a-android-22
     # - sys-img-armeabi-v7a-android-17
-
-
-# Emulator Management: Create, Start and Wait
+install:
+  - cd ../
+  - wget https://www.python.org/ftp/python/$PYVER/Python-$PYVER.tgz
+  - tar -xvf Python-$PYVER.tgz
+  - cd Python-$PYVER
+  - ./configure --prefix=/usr/local/python-$PYVER>log1.log && make>log2.log && sudo make install>log3.log
+  - python --version
+  - echo "ls -lha /usr/bin"
+  - ls -lha /usr/bin
+  - echo "ls -lha /usr/local"
+  - ls -lha /usr/local
+  - sudo rm -f /usr/bin/python
+  - ls -lha /usr/local/python-$PYVER/bin
+  - echo "sudo ln -fs /usr/local/python-$PYVER/bin/python${PYVER:0:3} /usr/bin/python"
+  - sudo ln -fs /usr/local/python-$PYVER/bin/python${PYVER:0:3} /usr/bin/python
+  - sudo chmod +x /usr/bin/python
+  
 before_script:
-  - sudo apt-get update
-  - test $USE_PY3 -eq 1 && sudo apt-get install python3 || true
+# Emulator Management: Create, Start and Wait
+  - python --version
   - echo no | android create avd --force -n test -t android-22 --abi armeabi-v7a
   - emulator -avd test -no-audio -no-window &
   - android-wait-for-emulator
   # - adb shell input keyevent 82 &
 
+  # - cd $TRAVIS_BUILD_DIR/$TRAVIS_REPO_SLUG
+  # /home/travis/build/lite3/adbtool/lite3/adbtool
 script:
+  - cd $TRAVIS_BUILD_DIR
   - chmod +x -R .
   - ls -lha /usr/local/android-sdk/platform-tools
   - ./adbdevice.py -l
