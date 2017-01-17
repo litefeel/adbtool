@@ -1,9 +1,10 @@
-#!/usr/bin/python
+#!/usr/bin/env python
 #  encoding=utf-8
 
 import argparse
 from cmd import call
 from cmd import getAdb
+import sys
 
 class Device:
     """docstring for Device"""
@@ -32,7 +33,7 @@ def getDevices():
             # skip first line "List of devices attached"
             for line in lines[1:]:
                 devices.append(Device(line))
-    devices.sort(cmp = lambda x,y: cmp(x.serial.lower(), y.serial.lower()))
+    devices.sort(key = lambda x: x.serial.lower())
     return devices
 
 def getDevicesBySerial(devices, serial):
@@ -76,7 +77,7 @@ def filterDevices(devices, args):
 
 def printDevices(devices):
     for i in range(len(devices)):
-        print('%d   %s' % (i + 1, devices[i].raw))
+        print('%-3d %s' % (i + 1, devices[i].raw))
 
 
 ##### for other script
