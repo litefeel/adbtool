@@ -1,11 +1,10 @@
-#!/usr/bin/python
+#!/usr/bin/env python
 #  encoding=utf-8
 
 import os
 import sys
 import shlex
 import subprocess
-
 
 # return (output, isOk)
 def call(cmd, printOutput=False):
@@ -17,13 +16,13 @@ def call(cmd, printOutput=False):
     else:
         # linux must split arguments
         args = shlex.split(cmd)
-    # output = subprocess.check_output(args)
     try:
         if printOutput:
             isOk = subprocess.call(args)
         else:
             output = subprocess.check_output(args)
-        # print(output)
+            # python3 output is bytes
+            output = output.decode("utf-8")
         return (output, isOk)
     except subprocess.CalledProcessError as e:
         print(e.output)
