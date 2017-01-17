@@ -3,8 +3,6 @@ sudo: required
 
 env:
   - PYVER=2.7.3 
-  - PYVER=3.0 
-  - PYVER=3.1 
   - PYVER=3.2 
   - PYVER=3.3.0 
   - PYVER=3.4.0 
@@ -65,8 +63,8 @@ script:
   - cd $TRAVIS_BUILD_DIR
   - chmod +x -R .
   - ls -lha /usr/local/android-sdk/platform-tools
-  - ./adbdevice.py -l
-  - ./adbdevice.py -h
-  - ./adbpush.py -h
-  - ./apkinstall.py -h
-  - ./apkinstall.py test/adbtooltest.apk
+  - adbtool/adbdevice.py -l
+  - adbtool/adbdevice.py -h
+  - adbtool/adbpush.py -h
+  - adbtool/apkinstall.py -h
+  - adbtool/apkinstall.py test/adbtooltest.apk
