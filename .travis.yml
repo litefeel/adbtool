@@ -45,8 +45,9 @@ install:
   - ls -lha /usr/local
   - sudo rm -f /usr/bin/python
   - ls -lha /usr/local/python-$PYVER/bin
-  - echo "sudo ln -fs /usr/local/python-$PYVER/bin/python${PYVER:0:3} /usr/bin/python"
-  - sudo ln -fs /usr/local/python-$PYVER/bin/python${PYVER:0:3} /usr/bin/python
+  - pyshortver=`echo $PYVER|awk -F. '{printf "%d.%d\n", $1,$2}'`
+  - echo "sudo ln -fs /usr/local/python-$PYVER/bin/python$pyshortver /usr/bin/python"
+  - sudo ln -fs /usr/local/python-$PYVER/bin/python$pyshortver /usr/bin/python
   - sudo chmod +x /usr/bin/python
   
 before_script:
