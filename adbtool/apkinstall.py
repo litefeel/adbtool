@@ -7,6 +7,7 @@ import sys
 
 from cmd import call
 from cmd import getAdb
+import apkinfo
 import adbdevice
 
 # BASE_DIR="F:/release"
@@ -44,12 +45,20 @@ def filterApks(fileorpath, filters):
     return apk
 
 
-def install(apks, serials):
+def install(apks, serials, run):
     adb = getAdb()
-    for apk in apks:
+    last = len(apks) - 1
+    for i in range(0, len(apks)):
+        apk = apks[i]
+        isrun = run and last == i
         for serial in serials:
             cmd = '%s -s %s install -r "%s"' % (adb, serial, apk)
-            call(cmd, True)
+            _, isOk = call(cmd, True)
+            print(isOk)
+            if isOk and isrun:
+                activity = apkinfo.parse(apk)
+                cmd = '%s -s %s shell am start "%s"' % (adb, serial, activity)
+                call(cmd)
 
 
 # -------------- main ----------------
@@ -58,6 +67,8 @@ if __name__ == '__main__':
         description='install apk file.')
     parser.add_argument('-f', '--filter', nargs='*',
         help='filtered by file name')
+    parser.add_argument('-r', '--run', action="store_true",
+        help='run app after install')
     parser.add_argument('path', nargs='?')
     adbdevice.addArgumentParser(parser)
 
@@ -73,4 +84,4 @@ if __name__ == '__main__':
     apks = filterApks(path, args.filter)
 
     if serials is not None and apks is not None:
-        install([apks], serials)
+        install([apks], serials, args.run)
