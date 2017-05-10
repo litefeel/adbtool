@@ -7,6 +7,9 @@ import re
 
 from cmd import call
 from cmd import getAapt
+from cmd import getAdb
+
+import adbdevice
 
 def firstitem(arr):
     return arr[0] if len(arr) > 0 else None
@@ -26,10 +29,23 @@ def parse(apk):
 if __name__ == '__main__':
     parser = argparse.ArgumentParser(usage='%(prog)s [options] apkpath',
         description='show apk packageName/activityName')
+    parser.add_argument('-r', '--run', action="store_true",
+        help='run app')
     parser.add_argument('apkpath', nargs='?')
+    adbdevice.addArgumentParser(parser)
 
     args = parser.parse_args()
+
+    isOk, serials = adbdevice.doArgumentParser(args)
+    if isOk:
+        exit(0)
+
     apkpath = os.path.abspath(args.apkpath)
-
-    print(parse(apkpath))
-
+    activity = parse(apkpath)
+    if args.run and serials is not None:
+        adb = getAdb()
+        for serial in serials:
+            cmd = '%s -s %s shell am start "%s"' % (adb, serial, activity)
+            call(cmd)
+    else:
+        print(activity)
