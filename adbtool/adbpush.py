@@ -39,7 +39,6 @@ date_dict = {}
 g_serial = ""
 
 
-
 def parsePrefix(prefix):
     if prefix is not None and len(prefix) == 2:
         return (prefix[0], prefix[1])
@@ -144,8 +143,6 @@ if __name__ == "__main__":
     isOk, serials, devices = adbdevice.doArgumentParser(args)
     if isOk:
         exit(0)
-
-    
 
     local, remote = parsePrefix(args.prefix)
 

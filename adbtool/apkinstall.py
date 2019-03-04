@@ -11,17 +11,20 @@ import apkinfo
 import adbdevice
 
 # BASE_DIR="F:/release"
-BASE_DIR=""
+BASE_DIR = ""
+
 
 def getApks(path, filters):
     apks = os.listdir(path)
-    apks = filter(lambda filename: filename.endswith('.apk'), apks)
+    apks = filter(lambda filename: filename.endswith(".apk"), apks)
     if filters is not None:
+
         def myfilterfun(filename):
             for f in filters:
                 if f not in filename:
                     return False
             return True
+
         apks = filter(myfilterfun, apks)
     apks = map(lambda filename: os.path.join(path, filename), apks)
     return apks
@@ -30,7 +33,9 @@ def getApks(path, filters):
 def getNewst(apks):
     if len(apks) == 0:
         return None
-    apks = sorted(apks, cmp=lambda fa, fb: int(os.path.getmtime(fb) - os.path.getmtime(fa)))
+    apks = sorted(
+        apks, cmp=lambda fa, fb: int(os.path.getmtime(fb) - os.path.getmtime(fa))
+    )
     return apks[0]
 
 
@@ -39,7 +44,7 @@ def filterApks(fileorpath, filters):
     if os.path.isdir(fileorpath):
         apks = getApks(fileorpath, filters)
         if len(apks) == 0:
-            print('can not found apk file in %s ' % fileorpath)
+            print("can not found apk file in %s " % fileorpath)
             exit(1)
         apk = getNewst(apks)
     return apk
@@ -62,14 +67,15 @@ def install(apks, serials, run):
 
 
 # -------------- main ----------------
-if __name__ == '__main__':
-    parser = argparse.ArgumentParser(usage='%(prog)s [options] [path]',
-        description='install apk file.')
-    parser.add_argument('-f', '--filter', nargs='*',
-        help='filtered by file name')
-    parser.add_argument('-r', '--run', action="store_true",
-        help='run app after install')
-    parser.add_argument('path', nargs='?')
+if __name__ == "__main__":
+    parser = argparse.ArgumentParser(
+        usage="%(prog)s [options] [path]", description="install apk file."
+    )
+    parser.add_argument("-f", "--filter", nargs="*", help="filtered by file name")
+    parser.add_argument(
+        "-r", "--run", action="store_true", help="run app after install"
+    )
+    parser.add_argument("path", nargs="?")
     adbdevice.addArgumentParser(parser)
 
     args = parser.parse_args()
@@ -78,7 +84,7 @@ if __name__ == '__main__':
     if isOk:
         exit(0)
 
-    path = args.path if args.path is not None else '.'
+    path = args.path if args.path is not None else "."
     path = os.path.abspath(os.path.join(BASE_DIR, path))
 
     apks = filterApks(path, args.filter)

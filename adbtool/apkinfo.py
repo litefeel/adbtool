@@ -11,27 +11,32 @@ from cmd import getAdb
 
 import adbdevice
 
+
 def firstitem(arr):
     return arr[0] if len(arr) > 0 else None
 
 
 def parse(apk):
     aapt = getAapt()
-    cmd = '%s dump badging %s' % (aapt, apk)
+    cmd = "%s dump badging %s" % (aapt, apk)
     output, isOk = call(cmd)
     if isOk:
         packagename = firstitem(re.findall(r"package: name='(\S+?)'", output))
-        activityname = firstitem(re.findall(r"launchable-activity: name='(\S+?)'", output))
-        return '%s/%s' % (packagename, activityname)
+        activityname = firstitem(
+            re.findall(r"launchable-activity: name='(\S+?)'", output)
+        )
+        return "%s/%s" % (packagename, activityname)
     return None
 
+
 # -------------- main ----------------
-if __name__ == '__main__':
-    parser = argparse.ArgumentParser(usage='%(prog)s [options] apkpath',
-        description='show apk packageName/activityName')
-    parser.add_argument('-r', '--run', action="store_true",
-        help='run app')
-    parser.add_argument('apkpath', nargs='?')
+if __name__ == "__main__":
+    parser = argparse.ArgumentParser(
+        usage="%(prog)s [options] apkpath",
+        description="show apk packageName/activityName",
+    )
+    parser.add_argument("-r", "--run", action="store_true", help="run app")
+    parser.add_argument("apkpath", nargs="?")
     adbdevice.addArgumentParser(parser)
 
     args = parser.parse_args()

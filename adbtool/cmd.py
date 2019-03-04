@@ -12,7 +12,7 @@ def call(cmd, printOutput=False):
     # print("call %s" % cmd)
     output = None
     isOk = True
-    if sys.platform == 'win32':
+    if sys.platform == "win32":
         args = cmd
     else:
         # linux must split arguments
@@ -31,17 +31,18 @@ def call(cmd, printOutput=False):
 
 
 def getAdb():
-    androidHome = os.getenv('ANDROID_HOME')
+    androidHome = os.getenv("ANDROID_HOME")
     if androidHome is None:
-        androidHome = os.getenv('ANDROID_SDK')
+        androidHome = os.getenv("ANDROID_SDK")
     if androidHome is None:
         # print('can not found ANDROID_HOME/ANDROID_SDK in environment value')
         return "adb"
 
-    return os.path.join(androidHome, 'platform-tools/adb')
+    return os.path.join(androidHome, "platform-tools/adb")
+
 
 def versionnum(a):
-    arr = a.split('.')
+    arr = a.split(".")
     multiple = 10000
     n = 0
     for i in range(0, min(len(arr), 3)):
@@ -50,25 +51,24 @@ def versionnum(a):
     return n
 
 
-def getAapt(vername = None):
-    androidHome = os.getenv('ANDROID_HOME')
+def getAapt(vername=None):
+    androidHome = os.getenv("ANDROID_HOME")
     if androidHome is None:
-        androidHome = os.getenv('ANDROID_SDK')
+        androidHome = os.getenv("ANDROID_SDK")
     if androidHome is None:
-        print('can not found ANDROID_HOME/ANDROID_SDK in environment value')
+        print("can not found ANDROID_HOME/ANDROID_SDK in environment value")
         return "aapt"
 
-    aaptname = 'aapt.exe' if sys.platform == 'win32' else'aapt'
+    aaptname = "aapt.exe" if sys.platform == "win32" else "aapt"
 
-    buildtools = os.path.join(androidHome, 'build-tools')
+    buildtools = os.path.join(androidHome, "build-tools")
     if os.path.isdir(buildtools):
         dirs = os.listdir(buildtools)
-        dirs.sort(reverse = True, key=versionnum)
+        dirs.sort(reverse=True, key=versionnum)
         for dir in dirs:
             filename = os.path.join(buildtools, dir, aaptname)
             if os.path.isfile(filename):
                 return filename
 
-    print('can not found aapt in ANDROID_HOME/ANDROID_SDK')
-
+    print("can not found aapt in ANDROID_HOME/ANDROID_SDK")
 
