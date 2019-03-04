@@ -2,7 +2,6 @@ language: android
 sudo: required
 
 env:
-  - PYVER=2.7.3 
   - PYVER=3.2 
   - PYVER=3.3.0 
   - PYVER=3.4.0 
