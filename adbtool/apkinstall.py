@@ -74,7 +74,7 @@ if __name__ == '__main__':
 
     args = parser.parse_args()
 
-    isOk, serials = adbdevice.doArgumentParser(args)
+    isOk, serials, devices = adbdevice.doArgumentParser(args)
     if isOk:
         exit(0)
 

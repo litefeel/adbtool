@@ -105,7 +105,7 @@ def doArgumentParser(args):
 
     devices = filterDevices(devices, args.devices)
     serials = getSerials(devices)
-    return (False, serials)
+    return (False, serials, devices)
 
 
 ##### end for other script

@@ -1,11 +1,13 @@
 #!/usr/bin/env python
 #  encoding=utf-8
 
-import os, os.path
+import os
+import os.path
 import argparse
 
 from cmd import call
 from cmd import getAdb
+import adbdevice
 
 
 # bat
@@ -27,10 +29,15 @@ from cmd import getAdb
 # adb push %localpath% %remotepath%
 
 
+from litefeel.pycommon.io import read_file, write_file
+import json
 
+prefixLocal = "D:/work/MFM_CODE_Client/MagicDoor/VFS/Android/main/"
+prefixRemote = "/sdcard/main/"
 
-prefixLocal  = "E:/work/zeus/GameEditors/UIEdit/res/"
-prefixRemote = "/sdcard/hookzeus/"
+date_dict = {}
+g_serial = ""
+
 
 
 def parsePrefix(prefix):
@@ -39,13 +46,29 @@ def parsePrefix(prefix):
     return (prefixLocal, prefixRemote)
 
 
-def push(file, prefixLocal, prefixRemote):
-    file = file.replace('\\', '/')
+def load_json(filename):
+    if filename is None:
+        return {}
+    if os.path.exists(filename):
+        return json.loads(read_file(filename))
+    return {}
+
+
+def push(file: str, prefixLocal, prefixRemote):
+    file = file.replace("\\", "/")
     local = file
     remote = file
+    refname = file
     if file.startswith(prefixLocal):
-        remote = prefixRemote + file[len(prefixLocal):]
-    call("%s push %s %s" % (getAdb(), local, remote), True)
+        remote = prefixRemote + file[len(prefixLocal) :]
+        refname = file[len(prefixLocal) :]
+
+    oldtime = date_dict.get(refname, 0)
+    mtime = os.path.getmtime(local)
+    if mtime != oldtime:
+        call('%s -s %s push "%s" "%s"' % (getAdb(), g_serial, local, remote), True)
+        date_dict[refname] = mtime
+
 
 def filePush(path, prefixLocal, prefixRemote):
     files = os.listdir(path)
@@ -54,31 +77,22 @@ def filePush(path, prefixLocal, prefixRemote):
         if os.path.isfile(file):
             push(file, prefixLocal, prefixRemote)
 
+
 def walkPush(path, prefixLocal, prefixRemote):
     for root, dirs, files in os.walk(path):
         for f in files:
             push("%s/%s" % (root, f), prefixLocal, prefixRemote)
 
 
-# -------------- main ----------------
-if __name__ == '__main__':
-    parser = argparse.ArgumentParser(usage='%(prog)s [options] [path]',
-        description='push file to android device')
-    parser.add_argument('-r', dest='recursion', action="store_true",
-        help='recursion all file')
-    parser.add_argument('-p', dest='prefix', nargs=2,
-        help='local prefix and remote prefix, will replace local prefix to remote prefix')
-    parser.add_argument('path', nargs='*', 
-        help='file or directory')
+def push_all(paths, local, remote, serial, datejson):
+    global g_serial, date_dict
+    g_serial = serial
 
+    # print(datejsonfile)
+    date_dict = load_json(datejson)
 
-    args = parser.parse_args()
-
-    local, remote = parsePrefix(args.prefix)
-
-    paths = args.path[:]
     if len(paths) == 0:
-        paths.append('.')
+        paths.append(".")
     for path in paths:
         path = os.path.abspath(path)
         if os.path.isfile(path):
@@ -90,3 +104,54 @@ if __name__ == '__main__':
                 filePush(path, local, remote)
         else:
             print("%s: No such file or directory" % path)
+
+    if datejson is not None:
+        write_file(datejson, json.dumps(date_dict, sort_keys=True, indent=4))
+
+
+# -------------- main ----------------
+if __name__ == "__main__":
+    parser = argparse.ArgumentParser(
+        usage="%(prog)s [options] [path]", description="push file to android device"
+    )
+    parser.add_argument(
+        "-r", dest="recursion", action="store_true", help="recursion all file"
+    )
+    parser.add_argument(
+        "-n",
+        dest="newst",
+        action="store_true",
+        help="only push new file by last modify files, see -j",
+    )
+    parser.add_argument(
+        "-j",
+        dest="datejson",
+        action="store",
+        nargs="?",
+        default="",
+        help="date json file, default: ./$deviceMode_$deviceSerial.json",
+    )
+    parser.add_argument(
+        "-p",
+        dest="prefix",
+        nargs=2,
+        help="local prefix and remote prefix, will replace local prefix to remote prefix",
+    )
+    parser.add_argument("path", nargs="*", help="file or directory")
+    adbdevice.addArgumentParser(parser)
+
+    args = parser.parse_args()
+    isOk, serials, devices = adbdevice.doArgumentParser(args)
+    if isOk:
+        exit(0)
+
+    
+
+    local, remote = parsePrefix(args.prefix)
+
+    paths = args.path[:]
+
+    for device in devices:
+        datejson = "%s_%s.json" % (device.model, device.serial)
+        push_all(paths, local, remote, device.serial, datejson)
+
