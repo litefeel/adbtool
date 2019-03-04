@@ -9,7 +9,7 @@ import math
 
 # return (output, isOk)
 def call(cmd, printOutput=False):
-    print("call %s" % cmd)
+    # print("call %s" % cmd)
     output = None
     isOk = True
     if sys.platform == 'win32':
@@ -35,7 +35,7 @@ def getAdb():
     if androidHome is None:
         androidHome = os.getenv('ANDROID_SDK')
     if androidHome is None:
-        print('can not found ANDROID_HOME/ANDROID_SDK in environment value')
+        # print('can not found ANDROID_HOME/ANDROID_SDK in environment value')
         return "adb"
 
     return os.path.join(androidHome, 'platform-tools/adb')
