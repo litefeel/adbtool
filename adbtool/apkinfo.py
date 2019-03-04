@@ -50,7 +50,7 @@ if __name__ == "__main__":
     if args.run and serials is not None:
         adb = getAdb()
         for serial in serials:
-            cmd = '%s -s %s shell am start "%s"' % (adb, serial, activity)
+            cmd = '%s -s %s shell am start -S "%s"' % (adb, serial, activity)
             call(cmd)
     else:
         print(activity)

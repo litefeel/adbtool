@@ -62,7 +62,7 @@ def install(apks, serials, run):
             print(isOk)
             if isOk and isrun:
                 activity = apkinfo.parse(apk)
-                cmd = '%s -s %s shell am start "%s"' % (adb, serial, activity)
+                cmd = '%s -s %s shell am start -S "%s"' % (adb, serial, activity)
                 call(cmd)
 
 
