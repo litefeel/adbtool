@@ -48,6 +48,8 @@ install:
   - echo "sudo ln -fs /usr/local/python-$PYVER/bin/python$pyshortver /usr/bin/python"
   - sudo ln -fs /usr/local/python-$PYVER/bin/python$pyshortver /usr/bin/python
   - sudo chmod +x /usr/bin/python
+  - cd $TRAVIS_BUILD_DIR
+  - sudo python -m pip install -r requirements.txt
   
 before_script:
 # Emulator Management: Create, Start and Wait
