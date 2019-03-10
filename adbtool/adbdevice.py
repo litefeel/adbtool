@@ -41,7 +41,9 @@ def getDevices():
 
 def getDevicesBySerial(devices, serial):
     serial = serial.lower()
-    return filter(lambda device: device.serial.lower().startswith(serial), devices)
+    return list(
+        filter(lambda device: device.serial.lower().startswith(serial), devices)
+    )
 
 
 # return
@@ -103,7 +105,7 @@ def addArgumentParser(parser):
         nargs="*",
         help="""filter of devices, [a | n | serial]
             a: all devices
-            n: index of devices list(start with 1) 
+            n: index of devices list(start with 1)
             serial: devices serial (at least 2 char)
             not argument is show device list""",
     )
