@@ -66,8 +66,10 @@ script:
   - cd $TRAVIS_BUILD_DIR
   - chmod +x -R .
   - ls -lha /usr/local/android-sdk/platform-tools
-  - adbtool/adbdevice.py -l
-  - adbtool/adbdevice.py -h
-  - adbtool/adbpush.py -h
-  - adbtool/apkinstall.py -h
-  - adbtool/apkinstall.py test/adbtooltest.apk
+  - python adbtool/adbdevice.py -l
+  - python adbtool/adbdevice.py -h
+  - python adbtool/adbdevice.py -d 1 2
+  - python adbtool/adbdevice.py -d em
+  - python adbtool/adbpush.py -h
+  - python adbtool/apkinstall.py -h
+  - python adbtool/apkinstall.py test/adbtooltest.apk
