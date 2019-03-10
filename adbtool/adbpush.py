@@ -1,14 +1,12 @@
-#!/usr/bin/env python
-#  encoding=utf-8
-
+import argparse
+import json
 import os
 import os.path
-import argparse
+from cmd import call, getAdb
 
-from cmd import call
-from cmd import getAdb
+from litefeel.pycommon.io import read_file, write_file
+
 import adbdevice
-
 
 # bat
 # @echo off
@@ -28,9 +26,6 @@ import adbdevice
 # echo %remotepath%
 # adb push %localpath% %remotepath%
 
-
-from litefeel.pycommon.io import read_file, write_file
-import json
 
 prefixLocal = "D:/work/MFM_CODE_Client/MagicDoor/VFS/Android/main/"
 prefixRemote = "/sdcard/main/"
@@ -151,4 +146,3 @@ if __name__ == "__main__":
     for device in devices:
         datejson = "%s_%s.json" % (device.model, device.serial)
         push_all(paths, local, remote, device.serial, datejson)
-

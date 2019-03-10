@@ -1,6 +1,3 @@
-#!/usr/bin/env python
-#  encoding=utf-8
-
 import os
 import sys
 import shlex
@@ -71,4 +68,3 @@ def getAapt(vername=None):
                 return filename
 
     print("can not found aapt in ANDROID_HOME/ANDROID_SDK")
-

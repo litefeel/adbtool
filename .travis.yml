@@ -2,8 +2,8 @@ language: android
 sudo: required
 
 env:
-  - PYVER=3.6.0 
-  - PYVER=3.7.2 
+  - PYVER=3.6.0
+  - PYVER=3.7.2
 
 matrix:
   allow_failures:
@@ -51,7 +51,7 @@ install:
   - sudo chmod +x /usr/bin/python
   - cd $TRAVIS_BUILD_DIR
   - sudo python -m pip install -r requirements.txt
-  
+
 before_script:
 # Emulator Management: Create, Start and Wait
   - python --version

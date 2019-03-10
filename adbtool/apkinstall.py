@@ -1,14 +1,11 @@
-#!/usr/bin/env python
-#  encoding=utf-8
-
-import os, os.path
 import argparse
+import os
+import os.path
 import sys
+from cmd import call, getAdb
 
-from cmd import call
-from cmd import getAdb
-import apkinfo
 import adbdevice
+import apkinfo
 
 # BASE_DIR="F:/release"
 BASE_DIR = ""

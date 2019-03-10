@@ -1,6 +1,3 @@
-#!/usr/bin/env python
-#  encoding=utf-8
-
 import argparse
 from cmd import call
 from cmd import getAdb
