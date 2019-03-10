@@ -3,34 +3,16 @@ import json
 import os
 import os.path
 from cmd import call, getAdb
+from typing import Dict
 
 from litefeel.pycommon.io import read_file, write_file
 
 import adbdevice
 
-# bat
-# @echo off
-# rem %cd% 工作目录/当前目录
-# rem %~dp0 bat文件所在目录
-
-# rem 启用延迟扩展，一行语句中延迟变量赋值
-# setlocal ENABLEDELAYEDEXPANSION
-
-# set rpstr=E:/work/zeus/GameEditors/UIEdit/res/
-# set xxx=/sdcard/hookzeus/
-# set localpath=%cd%/%1
-# set localpath=%localpath:\=/%
-
-# set remotepath=%localpath:E:/work/zeus/GameEditors/UIEdit/res/=!xxx!%
-# echo %localpath%
-# echo %remotepath%
-# adb push %localpath% %remotepath%
-
-
 prefixLocal = "D:/work/MFM_CODE_Client/MagicDoor/VFS/Android/main/"
 prefixRemote = "/sdcard/main/"
 
-date_dict = {}
+date_dict: Dict[str, float] = {}
 g_serial = ""
 
 
@@ -52,7 +34,7 @@ def push(file: str, prefixLocal, prefixRemote):
     file = file.replace("\\", "/")
     local = file
     remote = file
-    refname = file
+    refname: str = file
     if file.startswith(prefixLocal):
         remote = prefixRemote + file[len(prefixLocal) :]
         refname = file[len(prefixLocal) :]
@@ -73,7 +55,7 @@ def filePush(path, prefixLocal, prefixRemote):
 
 
 def walkPush(path, prefixLocal, prefixRemote):
-    for root, dirs, files in os.walk(path):
+    for root, _, files in os.walk(path):
         for f in files:
             push("%s/%s" % (root, f), prefixLocal, prefixRemote)
 
