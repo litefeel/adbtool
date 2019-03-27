@@ -24,15 +24,13 @@ def getApks(path, filters):
 
         apks = filter(myfilterfun, apks)
     apks = map(lambda filename: os.path.join(path, filename), apks)
-    return apks
+    return list(apks)
 
 
 def getNewst(apks):
     if len(apks) == 0:
         return None
-    apks = sorted(
-        apks, cmp=lambda fa, fb: int(os.path.getmtime(fb) - os.path.getmtime(fa))
-    )
+    apks = sorted(apks, key=lambda fa: os.path.getmtime(fa), reverse=True)
     return apks[0]
 
 
