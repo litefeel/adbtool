@@ -9,8 +9,8 @@ from litefeel.pycommon.io import read_file, write_file
 
 import adbdevice
 
-prefixLocal = "D:/work/MFM_CODE_Client/MagicDoor/VFS/Android/main/"
-prefixRemote = "/sdcard/main/"
+prefixLocal = "D:/work/MFM_CODE_Client/MagicDoor/VFS/Android/"
+prefixRemote = "/sdcard/"
 
 date_dict: Dict[str, float] = {}
 g_serial = ""
@@ -28,6 +28,21 @@ def load_json(filename):
     if os.path.exists(filename):
         return json.loads(read_file(filename))
     return {}
+
+
+def pull(file: str, prefixLocal, prefixRemote):
+    file = file.replace("\\", "/")
+    local = file
+    remote = file
+    refname: str = file
+    if file.startswith(prefixLocal):
+        remote = prefixRemote + file[len(prefixLocal) :]
+        refname = file[len(prefixLocal) :]
+
+    _, isOk = call(
+        '%s -s %s pull "%s" "%s"' % (getAdb(), g_serial, remote, local), True
+    )
+    return isOk
 
 
 def push(file: str, prefixLocal, prefixRemote):
@@ -64,6 +79,10 @@ def push_all(paths, local, remote, serial, datejson):
     global g_serial, date_dict
     g_serial = serial
 
+    if datejson is not None:
+        if not pull(datejson, local, remote):
+            os.remove(datejson)
+
     # print(datejsonfile)
     date_dict = load_json(datejson)
 
@@ -83,6 +102,7 @@ def push_all(paths, local, remote, serial, datejson):
 
     if datejson is not None:
         write_file(datejson, json.dumps(date_dict, sort_keys=True, indent=4))
+        push(datejson, local, remote)
 
 
 # -------------- main ----------------
@@ -127,4 +147,5 @@ if __name__ == "__main__":
 
     for device in devices:
         datejson = "%s_%s.json" % (device.model, device.serial)
+        datejson = os.path.abspath(datejson)
         push_all(paths, local, remote, device.serial, datejson)
