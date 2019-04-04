@@ -9,7 +9,7 @@ from litefeel.pycommon.io import read_file, write_file
 
 import adbdevice
 
-prefixLocal = "D:/work/MFM_CODE_Client/MagicDoor/VFS/Android/"
+prefixLocal = "D:/work/MFM_CODE_Client/Trunk/MagicDoor/VFS/Android2/"
 prefixRemote = "/sdcard/"
 
 date_dict: Dict[str, float] = {}
@@ -34,10 +34,8 @@ def pull(file: str, prefixLocal, prefixRemote):
     file = file.replace("\\", "/")
     local = file
     remote = file
-    refname: str = file
     if file.startswith(prefixLocal):
         remote = prefixRemote + file[len(prefixLocal) :]
-        refname = file[len(prefixLocal) :]
 
     _, isOk = call(
         '%s -s %s pull "%s" "%s"' % (getAdb(), g_serial, remote, local), True
@@ -81,7 +79,8 @@ def push_all(paths, local, remote, serial, datejson):
 
     if datejson is not None:
         if not pull(datejson, local, remote):
-            os.remove(datejson)
+            if os.path.isfile(datejson):
+                os.remove(datejson)
 
     # print(datejsonfile)
     date_dict = load_json(datejson)
