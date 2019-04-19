@@ -55,7 +55,8 @@ def push(file: str, prefixLocal, prefixRemote):
     oldtime = date_dict.get(refname, 0)
     mtime = os.path.getmtime(local)
     if mtime != oldtime:
-        call('%s -s %s push "%s" "%s"' % (getAdb(), g_serial, local, remote), True)
+        rellocal = os.path.relpath(local, ".")
+        call('%s -s %s push "%s" "%s"' % (getAdb(), g_serial, rellocal, remote), True)
         date_dict[refname] = mtime
 
 
