@@ -3,7 +3,8 @@ import json
 import os
 import os.path
 from cmd import call, getAdb
-from typing import Dict
+from typing import Dict, Callable
+import hashlib
 
 from litefeel.pycommon.io import read_file, write_file
 
@@ -12,8 +13,25 @@ import adbdevice
 prefixLocal = "D:/work/MFM_CODE_Client/Trunk/MagicDoor/VFS/Android2/"
 prefixRemote = "/sdcard/"
 
-date_dict: Dict[str, float] = {}
+date_dict: Dict[str, str] = {}
 g_serial = ""
+hashfunc: Callable[[str], str]
+
+
+def file_sha1(file: str) -> str:
+    sha1 = hashlib.sha1()
+    with open(file, mode="rb") as f:
+        while True:
+            data = f.read(65536)
+            if not data:
+                break
+            sha1.update(data)
+
+    return sha1.hexdigest()
+
+
+def file_mtime(file: str) -> str:
+    return str(os.path.getmtime(local))
 
 
 def parsePrefix(prefix):
@@ -52,12 +70,12 @@ def push(file: str, prefixLocal, prefixRemote):
         remote = prefixRemote + file[len(prefixLocal) :]
         refname = file[len(prefixLocal) :]
 
-    oldtime = date_dict.get(refname, 0)
-    mtime = os.path.getmtime(local)
-    if mtime != oldtime:
+    oldhash = date_dict.get(refname, "")
+    nowhash = hashfunc(local)
+    if oldhash != nowhash:
         rellocal = os.path.relpath(local, ".")
         call('%s -s %s push "%s" "%s"' % (getAdb(), g_serial, rellocal, remote), True)
-        date_dict[refname] = mtime
+        date_dict[refname] = nowhash
 
 
 def filePush(path, prefixLocal, prefixRemote):
@@ -74,17 +92,17 @@ def walkPush(path, prefixLocal, prefixRemote):
             push("%s/%s" % (root, f), prefixLocal, prefixRemote)
 
 
-def push_all(paths, local, remote, serial, datejson):
+def push_all(paths, local, remote, serial, hashjson):
     global g_serial, date_dict
     g_serial = serial
 
-    if datejson is not None:
-        if not pull(datejson, local, remote):
-            if os.path.isfile(datejson):
-                os.remove(datejson)
+    if hashjson is not None:
+        if not pull(hashjson, local, remote):
+            if os.path.isfile(hashjson):
+                os.remove(hashjson)
 
-    # print(datejsonfile)
-    date_dict = load_json(datejson)
+    # print(hashjsonfile)
+    date_dict = load_json(hashjson)
 
     if len(paths) == 0:
         paths.append(".")
@@ -100,9 +118,9 @@ def push_all(paths, local, remote, serial, datejson):
         else:
             print("%s: No such file or directory" % path)
 
-    if datejson is not None:
-        write_file(datejson, json.dumps(date_dict, sort_keys=True, indent=4))
-        push(datejson, local, remote)
+    if hashjson is not None:
+        write_file(hashjson, json.dumps(date_dict, sort_keys=True, indent=4))
+        push(hashjson, local, remote)
 
 
 # -------------- main ----------------
@@ -121,11 +139,19 @@ if __name__ == "__main__":
     )
     parser.add_argument(
         "-j",
-        dest="datejson",
+        dest="hashjson",
         action="store",
         nargs="?",
         default="",
-        help="date json file, default: ./$deviceMode_$deviceSerial.json",
+        help="hash json file, default: ./$deviceMode_$deviceSerial.json",
+    )
+    parser.add_argument(
+        "--hash",
+        dest="hash",
+        nargs="?",
+        default="sha1",
+        choices=["sha1", "mtime"],
+        help="hash function: mtime or sha1, default:mtime",
     )
     parser.add_argument(
         "-p",
@@ -145,7 +171,9 @@ if __name__ == "__main__":
 
     paths = args.path[:]
 
+    hashfunc = file_mtime if args.hash == "mtime" else file_sha1
+
     for device in devices:
-        datejson = "%s_%s.json" % (device.model, device.serial)
-        datejson = os.path.abspath(datejson)
-        push_all(paths, local, remote, device.serial, datejson)
+        hashjson = "%s_%s.json" % (device.model, device.serial)
+        hashjson = os.path.abspath(hashjson)
+        push_all(paths, local, remote, device.serial, hashjson)
