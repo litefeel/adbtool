@@ -29,6 +29,7 @@ if __name__ == "__main__":
         Command("device", adbdevice, "show android device list"),
         Command("push", adbpush, "push files to android device"),
         Command("install", apkinstall, "install apk file"),
+        Command("apk", apkinfo, "show apk packageName/activityName"),
     ]
 
     subparser = parser.add_subparsers(title="sub commands", dest="subcommand")

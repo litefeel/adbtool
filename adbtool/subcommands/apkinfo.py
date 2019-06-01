@@ -1,12 +1,9 @@
-import os.path
 import argparse
+import os.path
 import re
 
-from cmd import call
-from cmd import getAapt
-from cmd import getAdb
-
-import adbdevice
+from ..cmd import call, getAapt, getAdb
+from . import adbdevice
 
 
 def firstitem(arr):
@@ -26,19 +23,8 @@ def parse(apk):
     return None
 
 
-# -------------- main ----------------
-if __name__ == "__main__":
-    parser = argparse.ArgumentParser(
-        usage="%(prog)s [options] apkpath",
-        description="show apk packageName/activityName",
-    )
-    parser.add_argument("-r", "--run", action="store_true", help="run app")
-    parser.add_argument("apkpath", nargs="?")
-    adbdevice.addArgumentParser(parser)
-
-    args = parser.parse_args()
-
-    isOk, serials, devices = adbdevice.doArgumentParser(args)
+def docommand(args):
+    isOk, serials, _ = adbdevice.doArgumentParser(args)
     if isOk:
         exit(0)
 
@@ -51,3 +37,9 @@ if __name__ == "__main__":
             call(cmd)
     else:
         print(activity)
+
+
+def addcommand(parser: argparse.ArgumentParser):
+    parser.add_argument("-r", "--run", action="store_true", help="run app")
+    parser.add_argument("apkpath", nargs="?")
+    adbdevice.addArgumentParser(parser)
