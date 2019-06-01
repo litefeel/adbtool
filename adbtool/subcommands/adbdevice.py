@@ -1,6 +1,5 @@
 import argparse
-from cmd import call
-from cmd import getAdb
+from ..cmd import call, getAdb
 import sys
 
 
@@ -122,12 +121,18 @@ def doArgumentParser(args):
     return (False, serials, devices)
 
 
+def docommand(args):
+    if args.list:
+        printDevices(getDevices())
+        exit(0)
+
+    devices = filterDevices(getDevices(), args.devices)
+    printDevices(devices)
+
+
 ##### end for other script
 # -------------- main ----------------
-if __name__ == "__main__":
-    parser = argparse.ArgumentParser(
-        usage="%(prog)s [options]", description="show android device list"
-    )
+def addcommand(parser: argparse.ArgumentParser):
     parser.add_argument(
         "-d",
         "--devices",
@@ -136,10 +141,3 @@ if __name__ == "__main__":
     )
     parser.add_argument("-l", "--list", action="store_true", help="show devices list")
 
-    args = parser.parse_args()
-    if args.list:
-        printDevices(getDevices())
-        exit(0)
-
-    devices = filterDevices(getDevices(), args.devices)
-    printDevices(devices)
