@@ -1,14 +1,13 @@
 import argparse
+import hashlib
 import json
 import os
-import os.path
-from cmd import call, getAdb
-from typing import Dict, Callable
-import hashlib
+from typing import Callable, Dict
 
 from litefeel.pycommon.io import read_file, write_file
 
-import adbdevice
+from ..cmd import call, getAdb
+from . import adbdevice
 
 prefixLocal = "D:/work/MFM_CODE_Client/Trunk/MagicDoor/VFS/Android2/"
 prefixRemote = "/sdcard/"
@@ -16,6 +15,10 @@ prefixRemote = "/sdcard/"
 date_dict: Dict[str, str] = {}
 g_serial = ""
 hashfunc: Callable[[str], str]
+
+
+g_local = ""
+g_args = None
 
 
 def file_sha1(file: str) -> str:
@@ -31,7 +34,7 @@ def file_sha1(file: str) -> str:
 
 
 def file_mtime(file: str) -> str:
-    return str(os.path.getmtime(local))
+    return str(os.path.getmtime(g_local))
 
 
 def parsePrefix(prefix):
@@ -111,7 +114,7 @@ def push_all(paths, local, remote, serial, hashjson):
         if os.path.isfile(path):
             push(path, local, remote)
         elif os.path.isdir(path):
-            if args.recursion:
+            if g_args.recursion:
                 walkPush(path, local, remote)
             else:
                 filePush(path, local, remote)
@@ -123,11 +126,26 @@ def push_all(paths, local, remote, serial, hashjson):
         push(hashjson, local, remote)
 
 
-# -------------- main ----------------
-if __name__ == "__main__":
-    parser = argparse.ArgumentParser(
-        usage="%(prog)s [options] [path]", description="push file to android device"
-    )
+def docommand(args):
+    isOk, serials, devices = adbdevice.doArgumentParser(args)
+    if isOk:
+        exit(0)
+
+    global g_args, g_local, hashfunc
+    g_args = args
+    g_local, remote = parsePrefix(args.prefix)
+
+    paths = args.path[:]
+
+    hashfunc = file_mtime if args.hash == "mtime" else file_sha1
+
+    for device in devices:
+        hashjson = "%s_%s.json" % (device.model, device.serial)
+        hashjson = os.path.abspath(hashjson)
+        push_all(paths, g_local, remote, device.serial, hashjson)
+
+
+def addcommand(parser: argparse.ArgumentParser):
     parser.add_argument(
         "-r", dest="recursion", action="store_true", help="recursion all file"
     )
@@ -161,19 +179,3 @@ if __name__ == "__main__":
     )
     parser.add_argument("path", nargs="*", help="file or directory")
     adbdevice.addArgumentParser(parser)
-
-    args = parser.parse_args()
-    isOk, serials, devices = adbdevice.doArgumentParser(args)
-    if isOk:
-        exit(0)
-
-    local, remote = parsePrefix(args.prefix)
-
-    paths = args.path[:]
-
-    hashfunc = file_mtime if args.hash == "mtime" else file_sha1
-
-    for device in devices:
-        hashjson = "%s_%s.json" % (device.model, device.serial)
-        hashjson = os.path.abspath(hashjson)
-        push_all(paths, local, remote, device.serial, hashjson)

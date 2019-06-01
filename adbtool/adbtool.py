@@ -3,20 +3,21 @@ import sys
 from typing import List
 
 from .subcommands import adbdevice
+from .subcommands import adbpush
 
 
 class Command:
-    def __init__(self, name: str, addcommand, docommand):
+    def __init__(self, name: str, command, help):
         self.name = name
-        self.addcommand = addcommand
-        self.docommand = docommand
+        self.command = command
+        self.help = help
 
 
 def addsubcommands(subparser: argparse._SubParsersAction, commands: List[Command]):
     for cmd in commands:
         parser = subparser.add_parser(cmd.name)
-        parser.set_defaults(docommand=cmd.docommand)
-        cmd.addcommand(parser)
+        parser.set_defaults(docommand=cmd.command.docommand)
+        cmd.command.addcommand(parser)
 
 
 # -------------- main ----------------
@@ -25,7 +26,10 @@ if __name__ == "__main__":
         usage="%(prog)s [options]", description="show android device list"
     )
 
-    commands = [Command("device", adbdevice.addcommand, adbdevice.docommand)]
+    commands = [
+        Command("device", adbdevice, "show android device list"),
+        Command("push", adbpush, "push files to android device"),
+    ]
 
     subparser = parser.add_subparsers(title="sub commands", dest="subcommand")
     addsubcommands(subparser, commands)
