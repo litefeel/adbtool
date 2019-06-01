@@ -14,7 +14,7 @@ class Command:
 
 def addsubcommands(subparser: argparse._SubParsersAction, commands: List[Command]):
     for cmd in commands:
-        parser = subparser.add_parser(cmd.name)
+        parser = subparser.add_parser(cmd.name, help=cmd.help)
         parser.set_defaults(docommand=cmd.command.docommand)
         cmd.command.addcommand(parser)
 
