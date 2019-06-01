@@ -1,11 +1,9 @@
 import argparse
 import os
-import os.path
 import sys
-from cmd import call, getAdb
 
-import adbdevice
-import apkinfo
+from ..cmd import call, getAdb
+from . import adbdevice, apkinfo
 
 # BASE_DIR="F:/release"
 BASE_DIR = ""
@@ -61,20 +59,7 @@ def install(apks, serials, run):
                 call(cmd)
 
 
-# -------------- main ----------------
-if __name__ == "__main__":
-    parser = argparse.ArgumentParser(
-        usage="%(prog)s [options] [path]", description="install apk file."
-    )
-    parser.add_argument("-f", "--filter", nargs="*", help="filtered by file name")
-    parser.add_argument(
-        "-r", "--run", action="store_true", help="run app after install"
-    )
-    parser.add_argument("path", nargs="?")
-    adbdevice.addArgumentParser(parser)
-
-    args = parser.parse_args()
-
+def docommand(args):
     isOk, serials, devices = adbdevice.doArgumentParser(args)
     if isOk:
         exit(0)
@@ -86,3 +71,12 @@ if __name__ == "__main__":
 
     if serials is not None and apks is not None:
         install([apks], serials, args.run)
+
+
+def addcommand(parser: argparse.ArgumentParser):
+    parser.add_argument("-f", "--filter", nargs="*", help="filtered by file name")
+    parser.add_argument(
+        "-r", "--run", action="store_true", help="run app after install"
+    )
+    parser.add_argument("path", nargs="?")
+    adbdevice.addArgumentParser(parser)

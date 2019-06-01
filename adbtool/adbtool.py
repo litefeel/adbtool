@@ -2,8 +2,7 @@ import argparse
 import sys
 from typing import List
 
-from .subcommands import adbdevice
-from .subcommands import adbpush
+from .subcommands import adbdevice, adbpush, apkinfo, apkinstall
 
 
 class Command:
@@ -29,6 +28,7 @@ if __name__ == "__main__":
     commands = [
         Command("device", adbdevice, "show android device list"),
         Command("push", adbpush, "push files to android device"),
+        Command("install", apkinstall, "install apk file"),
     ]
 
     subparser = parser.add_subparsers(title="sub commands", dest="subcommand")
