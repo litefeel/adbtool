@@ -3,6 +3,7 @@ import os.path
 import re
 
 from ..cmd import call, getAapt, getAdb
+from ..config import Config
 from . import adbdevice
 
 
@@ -23,7 +24,7 @@ def parse(apk):
     return None
 
 
-def docommand(args):
+def docommand(args, cfg: Config):
     isOk, serials, _ = adbdevice.doArgumentParser(args)
     if isOk:
         exit(0)

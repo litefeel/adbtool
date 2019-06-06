@@ -68,6 +68,7 @@ def push(file: str, prefixLocal, prefixRemote):
 
     oldhash = date_dict.get(refname, "")
     nowhash = hashfunc(local)
+
     if oldhash != nowhash:
         rellocal = os.path.relpath(local, ".")
         call('%s -s %s push "%s" "%s"' % (getAdb(), g_serial, rellocal, remote), True)
@@ -140,6 +141,7 @@ def docommand(args, cfg: Config):
     if args.recursion:
         push_cfg.recursion = True
 
+    print(push_cfg.recursion)
     paths = args.path[:]
     if len(paths) > 0:
         push_cfg.paths = paths

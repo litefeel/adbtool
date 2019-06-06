@@ -1,6 +1,8 @@
 import argparse
-from ..cmd import call, getAdb
 import sys
+
+from ..cmd import call, getAdb
+from ..config import Config
 
 
 class Device:
@@ -121,7 +123,7 @@ def doArgumentParser(args):
     return (False, serials, devices)
 
 
-def docommand(args):
+def docommand(args, cfg: Config):
     if args.list:
         printDevices(getDevices())
         exit(0)
@@ -140,4 +142,3 @@ def addcommand(parser: argparse.ArgumentParser):
         help="filter of devices, [n | serial | a] n:index of list(start with 1), serial:at least 2 char, a:all",
     )
     parser.add_argument("-l", "--list", action="store_true", help="show devices list")
-

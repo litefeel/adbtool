@@ -3,6 +3,7 @@ import os
 import sys
 
 from ..cmd import call, getAdb
+from ..config import Config
 from . import adbdevice, apkinfo
 
 # BASE_DIR="F:/release"
@@ -59,7 +60,7 @@ def install(apks, serials, run):
                 call(cmd)
 
 
-def docommand(args):
+def docommand(args, cfg: Config):
     isOk, serials, devices = adbdevice.doArgumentParser(args)
     if isOk:
         exit(0)
