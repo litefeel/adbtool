@@ -1,0 +1,7 @@
+
+push:
+  localdir: .
+  remotedir: /sdcard/remote
+  recursion: true
+  paths:
+  - main
