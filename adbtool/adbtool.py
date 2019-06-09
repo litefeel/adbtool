@@ -4,6 +4,7 @@ import sys
 from typing import List
 
 from litefeel.pycommon.io import read_file
+
 from .config import Config
 from .subcommands import adbdevice, adbpush, apkinfo, apkinstall
 
@@ -37,7 +38,7 @@ def add_global_params(parser: argparse.ArgumentParser):
     )
 
 
-def main():
+def main(args=None):
     parser = argparse.ArgumentParser(
         usage="%(prog)s [options]", description="show android device list"
     )
@@ -54,7 +55,7 @@ def main():
     subparser = parser.add_subparsers(title="sub commands", dest="subcommand")
     addsubcommands(subparser, commands)
 
-    args = parser.parse_args()
+    args = parser.parse_args(args)
     if args.subcommand is None:
         parser.print_help()
         exit(0)
