@@ -1,1 +1,2 @@
 litefeel-pycommon
+PyYAML
