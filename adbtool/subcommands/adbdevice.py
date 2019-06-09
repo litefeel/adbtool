@@ -35,7 +35,8 @@ def getDevices():
         if len(lines) > 1:
             # skip first line "List of devices attached"
             for line in lines[1:]:
-                devices.append(Device(line))
+                if len(line) > 0:
+                    devices.append(Device(line))
     devices.sort(key=lambda x: x.serial.lower())
     return devices
 
@@ -85,6 +86,8 @@ def filterDevices(devices, args):
 
 
 def printDevices(devices):
+    if devices is None:
+        return
     for i in range(len(devices)):
         print("%-3d %s" % (i + 1, devices[i].raw))
 
