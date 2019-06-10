@@ -62,15 +62,17 @@ before_script:
 
   # - cd $TRAVIS_BUILD_DIR/$TRAVIS_REPO_SLUG
   # /home/travis/build/lite3/adbtool/lite3/adbtool
-script:
   - cd $TRAVIS_BUILD_DIR
   - chmod +x -R .
+  - export PYTHONPATH="$(pwd)"
+script:
   - ls -lha /usr/local/android-sdk/platform-tools
-  - python -m adbtool.adbtool
-  - python -m adbtool.adbtool device -l
-  - python -m adbtool.adbtool device -h
-  - python -m adbtool.adbtool device -d 1 2
-  - python -m adbtool.adbtool device -d em
-  - python -m adbtool.adbtool push -h
-  - python -m adbtool.adbtool install -h
-  - python -m adbtool.adbtool install test/adbtooltest.apk
+  - pytest
+  # - python -m adbtool.adbtool
+  # - python -m adbtool.adbtool device -l
+  # - python -m adbtool.adbtool device -h
+  # - python -m adbtool.adbtool device -d 1 2
+  # - python -m adbtool.adbtool device -d em
+  # - python -m adbtool.adbtool push -h
+  # - python -m adbtool.adbtool install -h
+  # - python -m adbtool.adbtool install test/adbtooltest.apk
