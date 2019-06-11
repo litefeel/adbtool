@@ -32,16 +32,28 @@ android:
     # - sys-img-armeabi-v7a-android-17
 
 install:
-  - sudo apt-get update
-  - sudo apt-get install python3-pip
-  - sudo apt-get install android-tools-adb
-  - sudo python3.6 -m pip install androidtool
-  # - cd $TRAVIS_BUILD_DIR
-  - sudo python3.6 -m pip install -r requirements.txt
+  - cd ../
+  - wget https://www.python.org/ftp/python/$PYVER/Python-$PYVER.tgz
+  - tar -xvf Python-$PYVER.tgz
+  - cd Python-$PYVER
+  - ./configure --prefix=/usr/local/python-$PYVER>log1.log && make>log2.log && sudo make install>log3.log
+  - python --version
+  - echo "ls -lha /usr/bin"
+  - ls -lha /usr/bin
+  - echo "ls -lha /usr/local"
+  - ls -lha /usr/local
+  - sudo rm -f /usr/bin/python
+  - ls -lha /usr/local/python-$PYVER/bin
+  - pyshortver=`echo $PYVER|awk -F. '{printf "%d.%d\n", $1,$2}'`
+  - echo "sudo ln -fs /usr/local/python-$PYVER/bin/python$pyshortver /usr/bin/python"
+  - sudo ln -fs /usr/local/python-$PYVER/bin/python$pyshortver /usr/bin/python
+  - sudo chmod +x /usr/bin/python
+  - cd $TRAVIS_BUILD_DIR
+  - sudo python -m pip install -r requirements.txt
 
 before_script:
 # Emulator Management: Create, Start and Wait
-  - python3.6 --version
+  - python --version
   - echo no | android create avd --force -n test -t android-22 --abi armeabi-v7a
   - emulator -avd test -no-audio -no-window &
   - android-wait-for-emulator
@@ -54,7 +66,7 @@ before_script:
   - export PYTHONPATH="$(pwd)"
 script:
   - ls -lha /usr/local/android-sdk/platform-tools
-  - python3.6 -m pytest
+  - python -m pytest
   # - python -m adbtool.adbtool
   # - python -m adbtool.adbtool device -l
   # - python -m adbtool.adbtool device -h
