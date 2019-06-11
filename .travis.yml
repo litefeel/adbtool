@@ -1,5 +1,6 @@
 language: android
 sudo: required
+jdk: oraclejdk8
 
 env:
   - PYVER=3.6.0
@@ -30,18 +31,13 @@ android:
     - sys-img-armeabi-v7a-android-22
     # - sys-img-armeabi-v7a-android-17
 
-addons:
-  apt:
-    sources:
-      - deadsnakes
-    packages:
-      # Highest available version whitelisted at
-      # https://github.com/travis-ci/apt-package-whitelist/blob/master/ubuntu-precise
-      - pythone3.5
-      - python3-pip
 install:
+  - sudo apt-get install python3
+  - sudo apt-get install python3-pip
+  - sudo apt-get install android-tools-adb
+  - sudo python3 -m pip install androidtool
   # - cd $TRAVIS_BUILD_DIR
-  - sudo pip3 install -r requirements.txt
+  - sudo python3 -m pip install -r requirements.txt
 
 before_script:
 # Emulator Management: Create, Start and Wait
