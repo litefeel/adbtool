@@ -32,7 +32,8 @@ android:
     # - sys-img-armeabi-v7a-android-17
 
 install:
-  - sudo apt-get install python3
+  - sudo apt-get update
+  - sudo apt-get install python3.6
   - sudo apt-get install python3-pip
   - sudo apt-get install android-tools-adb
   - sudo python3 -m pip install androidtool
