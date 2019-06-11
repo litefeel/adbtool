@@ -33,16 +33,15 @@ android:
 
 install:
   - sudo apt-get update
-  - sudo apt-get install python3.6
   - sudo apt-get install python3-pip
   - sudo apt-get install android-tools-adb
-  - sudo python3 -m pip install androidtool
+  - sudo python3.6 -m pip install androidtool
   # - cd $TRAVIS_BUILD_DIR
-  - sudo python3 -m pip install -r requirements.txt
+  - sudo python3.6 -m pip install -r requirements.txt
 
 before_script:
 # Emulator Management: Create, Start and Wait
-  - python3 --version
+  - python3.6 --version
   - echo no | android create avd --force -n test -t android-22 --abi armeabi-v7a
   - emulator -avd test -no-audio -no-window &
   - android-wait-for-emulator
@@ -55,7 +54,7 @@ before_script:
   - export PYTHONPATH="$(pwd)"
 script:
   - ls -lha /usr/local/android-sdk/platform-tools
-  - python3 -m pytest
+  - python3.6 -m pytest
   # - python -m adbtool.adbtool
   # - python -m adbtool.adbtool device -l
   # - python -m adbtool.adbtool device -h
