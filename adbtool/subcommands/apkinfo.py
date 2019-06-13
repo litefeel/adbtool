@@ -4,6 +4,7 @@ import re
 
 from ..cmd import call, getAapt, getAdb
 from ..config import Config
+from ..errors import raise_error
 from . import adbdevice
 
 
@@ -32,7 +33,15 @@ def docommand(args, cfg: Config):
     if args.apkpath is not None:
         cfg.apk.apkpath = args.apkpath
 
-    apkpath = os.path.abspath(args.apkpath)
+    if cfg.apk.apkpath is None:
+        raise_error("Missing parameter: apkpath")
+        return
+
+    apkpath = os.path.abspath(cfg.apk.apkpath)
+    if not os.path.isfile(apkpath):
+        raise_error("apkpath is not file")
+        return
+
     activity = parse(apkpath)
     if args.run and serials is not None:
         adb = getAdb()
