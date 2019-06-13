@@ -29,6 +29,9 @@ def docommand(args, cfg: Config):
     if isOk:
         exit(0)
 
+    if args.apkpath is not None:
+        cfg.apk.apkpath = args.apkpath
+
     apkpath = os.path.abspath(args.apkpath)
     activity = parse(apkpath)
     if args.run and serials is not None:
