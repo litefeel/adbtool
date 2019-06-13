@@ -46,7 +46,7 @@ def main(args=None):
     add_global_params(parser)
 
     commands = [
-        Command("device", adbdevice, "show android device list"),
+        Command("devices", adbdevice, "show android device list"),
         Command("push", adbpush, "push files to android device"),
         Command("install", apkinstall, "install apk file"),
         Command("apk", apkinfo, "show apk packageName/activityName"),
