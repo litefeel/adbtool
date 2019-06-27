@@ -56,20 +56,32 @@ class ApkConfig:
         copy_value("apkpath", obj, self, None)
         copy_bool("run", obj, self, False)
 
+class InstallConfig:
+    def __init__(self):
+        self.apkpath = None
+        self.run = False
+        self.devices = None
+
+    def load(self, obj):
+        copy_value("devices", obj, self, None)
+        copy_value("apkpath", obj, self, None)
+        copy_bool("run", obj, self, False)
 
 class Config:
     def __init__(self):
         self.push = PushConfig()
         self.apk = ApkConfig()
+        self.install = InstallConfig()
 
     def load(self, obj):
         copy_subconfig("push", obj, self.push)
         copy_subconfig("apk", obj, self.apk)
+        copy_subconfig("install", obj, self.install)
 
     def load_config(self, filename: str):
         data = read_file(filename)
         obj = yaml.load(data, Loader=yaml.loader.BaseLoader)
-        var_dump(obj)
+        # var_dump(obj)
         self.load(obj)
 
 

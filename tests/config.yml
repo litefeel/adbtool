@@ -5,3 +5,11 @@ push:
   recursion: true
   paths:
   - main
+
+apk:
+  run: false
+  apkpath: 
+
+install:
+  run: false
+  apkpath: 

@@ -44,7 +44,7 @@ def filterApks(fileorpath, filters):
     return apk
 
 
-def install(apks, serials, run):
+def install(apks, serials, run: bool):
     adb = getAdb()
     last = len(apks) - 1
     for i in range(0, len(apks)):
@@ -65,13 +65,13 @@ def docommand(args, cfg: Config):
     if isOk:
         exit(0)
 
-    path = args.path if args.path is not None else "."
+    path = args.apkpath or cfg.install.apkpath or "."
     path = os.path.abspath(os.path.join(BASE_DIR, path))
 
     apks = filterApks(path, args.filter)
 
     if serials is not None and apks is not None:
-        install([apks], serials, args.run)
+        install([apks], serials, args.run or cfg.install.run)
 
 
 def addcommand(parser: argparse.ArgumentParser):
@@ -79,5 +79,5 @@ def addcommand(parser: argparse.ArgumentParser):
     parser.add_argument(
         "-r", "--run", action="store_true", help="run app after install"
     )
-    parser.add_argument("path", nargs="?")
+    parser.add_argument("apkpath", nargs="?")
     adbdevice.addArgumentParser(parser)
