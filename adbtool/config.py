@@ -38,6 +38,7 @@ class PushConfig:
         self.localdir = "."
         self.remotedir = "/sdcard"
         self.recursion = False
+        self.dontpush = False
         self.paths = []
 
     def load(self, obj):
@@ -45,6 +46,7 @@ class PushConfig:
         copy_value("remotedir", obj, self, "/sdcard")
         copy_value("paths", obj, self, [])
         copy_bool("recursion", obj, self, False)
+        copy_bool("dontpush", obj, self, False)
 
 
 class ApkConfig:

@@ -17,8 +17,6 @@ hashfunc: Callable[[str], str]
 
 push_cfg: PushConfig
 
-g_args = None
-
 
 def file_sha1(file: str) -> str:
     sha1 = hashlib.sha1()
@@ -57,7 +55,7 @@ def pull(file: str, prefixLocal, prefixRemote):
     return isOk
 
 
-def push(file: str, prefixLocal, prefixRemote):
+def push(file: str, prefixLocal, prefixRemote, dontpush):
     file = file.replace("\\", "/")
     local = file
     remote = file
@@ -69,24 +67,27 @@ def push(file: str, prefixLocal, prefixRemote):
     oldhash = date_dict.get(refname, "")
     nowhash = hashfunc(local)
 
-    if oldhash != nowhash:
-        rellocal = os.path.relpath(local, ".")
-        call('%s -s %s push "%s" "%s"' % (getAdb(), g_serial, rellocal, remote), True)
+    if oldhash != nowhash or dontpush:
+        if not dontpush:
+            rellocal = os.path.relpath(local, ".")
+            call(
+                '%s -s %s push "%s" "%s"' % (getAdb(), g_serial, rellocal, remote), True
+            )
         date_dict[refname] = nowhash
 
 
-def filePush(path, prefixLocal, prefixRemote):
+def filePush(path, prefixLocal, prefixRemote, dontpush):
     files = os.listdir(path)
     for f in files:
         file = "%s/%s" % (path, f)
         if os.path.isfile(file):
-            push(file, prefixLocal, prefixRemote)
+            push(file, prefixLocal, prefixRemote, dontpush)
 
 
-def walkPush(path, prefixLocal, prefixRemote):
+def walkPush(path, prefixLocal, prefixRemote, dontpush):
     for root, _, files in os.walk(path):
         for f in files:
-            push("%s/%s" % (root, f), prefixLocal, prefixRemote)
+            push("%s/%s" % (root, f), prefixLocal, prefixRemote, dontpush)
 
 
 def push_all(cfg: PushConfig, serial, hashjson):
@@ -107,18 +108,19 @@ def push_all(cfg: PushConfig, serial, hashjson):
     for path in cfg.paths:
         path = os.path.abspath(path)
         if os.path.isfile(path):
-            push(path, local, remote)
+            push(path, local, remote, cfg.dontpush)
         elif os.path.isdir(path):
             if cfg.recursion:
-                walkPush(path, local, remote)
+                walkPush(path, local, remote, cfg.dontpush)
             else:
-                filePush(path, local, remote)
+                filePush(path, local, remote, cfg.dontpush)
         else:
             print("%s: No such file or directory" % path)
 
     if hashjson is not None:
         write_file(hashjson, json.dumps(date_dict, sort_keys=True, indent=4))
-        push(hashjson, local, remote)
+        if not cfg.dontpush:
+            push(hashjson, local, remote, cfg.dontpush)
 
 
 def docommand(args, cfg: Config):
@@ -129,8 +131,10 @@ def docommand(args, cfg: Config):
     global push_cfg
 
     push_cfg = cfg.push
-    global g_args, hashfunc
-    g_args = args
+    global hashfunc
+
+    if args.dontpush:
+        push_cfg.dontpush = True
 
     if args.localdir is not None:
         push_cfg.localdir = args.localdir
@@ -141,7 +145,6 @@ def docommand(args, cfg: Config):
     if args.recursion:
         push_cfg.recursion = True
 
-    print(push_cfg.recursion)
     paths = args.path[:]
     if len(paths) > 0:
         push_cfg.paths = paths
@@ -191,6 +194,12 @@ def addcommand(parser: argparse.ArgumentParser):
         "--remotedir",
         dest="remotedir",
         help="local prefix and remote prefix, will replace local prefix to remote prefix",
+    )
+    parser.add_argument(
+        "--dontpush",
+        dest="dontpush",
+        action="store_true",
+        help="only outout json file, not really push file to remote",
     )
     parser.add_argument("path", nargs="*", help="file or directory")
     adbdevice.addArgumentParser(parser)
