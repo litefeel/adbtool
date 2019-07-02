@@ -68,12 +68,14 @@ def push(file: str, prefixLocal, prefixRemote, dontpush):
     nowhash = hashfunc(local)
 
     if oldhash != nowhash or dontpush:
+        isOk = True
         if not dontpush:
             rellocal = os.path.relpath(local, ".")
-            call(
+            _, isOk = call(
                 '%s -s %s push "%s" "%s"' % (getAdb(), g_serial, rellocal, remote), True
             )
-        date_dict[refname] = nowhash
+        if isOk:
+            date_dict[refname] = nowhash
 
 
 def filePush(path, prefixLocal, prefixRemote, dontpush):
