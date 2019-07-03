@@ -14,6 +14,7 @@ from . import adbdevice
 date_dict: Dict[str, str] = {}
 g_serial = ""
 hashfunc: Callable[[str], str]
+errors = []
 
 push_cfg: PushConfig
 
@@ -59,12 +60,12 @@ def push(file: str, prefixLocal, prefixRemote, dontpush):
     file = file.replace("\\", "/")
     local = file
     remote = file
-    refname: str = file
+    relname: str = file
     if file.startswith(prefixLocal):
         remote = prefixRemote + file[len(prefixLocal) :]
-        refname = file[len(prefixLocal) :]
+        relname = file[len(prefixLocal) :]
 
-    oldhash = date_dict.get(refname, "")
+    oldhash = date_dict.get(relname, "")
     nowhash = hashfunc(local)
 
     if oldhash != nowhash or dontpush:
@@ -75,7 +76,9 @@ def push(file: str, prefixLocal, prefixRemote, dontpush):
                 '%s -s %s push "%s" "%s"' % (getAdb(), g_serial, rellocal, remote), True
             )
         if isOk:
-            date_dict[refname] = nowhash
+            date_dict[relname] = nowhash
+        else:
+            errors.append(relname)
 
 
 def filePush(path, prefixLocal, prefixRemote, dontpush):
@@ -95,6 +98,7 @@ def walkPush(path, prefixLocal, prefixRemote, dontpush):
 def push_all(cfg: PushConfig, serial, hashjson):
     global g_serial, date_dict
     g_serial = serial
+    errors.clear()
 
     local = cfg.localdir
     remote = cfg.remotedir
@@ -123,6 +127,10 @@ def push_all(cfg: PushConfig, serial, hashjson):
         write_file(hashjson, json.dumps(date_dict, sort_keys=True, indent=4))
         if not cfg.dontpush:
             push(hashjson, local, remote, cfg.dontpush)
+
+    if len(errors) > 0:
+        print("error paths:")
+        map(print, errors)
 
 
 def docommand(args, cfg: Config):
