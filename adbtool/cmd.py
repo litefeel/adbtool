@@ -5,10 +5,10 @@ import subprocess
 import math
 
 # return (output, isOk)
-def call(cmd, printOutput=False):
+def call(cmd: str, printOutput=False):
     # print("call %s" % cmd)
-    output = None
-    isOk = True
+    # output = None
+    # isOk = True
     if sys.platform == "win32":
         args = cmd
     else:
@@ -18,9 +18,9 @@ def call(cmd, printOutput=False):
         if printOutput:
             isOk = subprocess.call(args) == 0
         else:
-            output = subprocess.check_output(args)
+            data = subprocess.check_output(args)
             # python3 output is bytes
-            output = output.decode("utf-8")
+            output = data.decode("utf-8")
         return (output, isOk)
     except subprocess.CalledProcessError as e:
         print(e.output)
@@ -38,13 +38,14 @@ def getAdb():
     return os.path.join(androidHome, "platform-tools/adb")
 
 
-def versionnum(a):
+def versionnum(a: str):
     arr = a.split(".")
-    multiple = 10000
+    arr.reverse()
+    multiple = 1
     n = 0
     for i in range(0, min(len(arr), 3)):
         n += int(arr[i]) * multiple
-        multiple /= 100
+        multiple *= 1000
     return n
 
 
