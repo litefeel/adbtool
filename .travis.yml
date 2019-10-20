@@ -1,30 +1,32 @@
 # thanks https://github.com/ashishb/adb-enhanced/blob/master/.travis.yml
 # https://stackoverflow.com/questions/27644586/how-to-set-up-travis-ci-with-multiple-languages
+
+language: python
+
+python:
+  - "3.6"
+  - "3.7"
+  - "3.8"
+
+env:
+  - Action=lint
+  - Action=install
+
+before_script:
+  - pip install -r requirements.txt
+  - pip install pylint
+
+script:
+  - if [ $Action == "lint" ]; then
+    ./scripts/lint_check_python3.sh;
+    fi
+
+  - if [ $Action == "install" ]; then
+    python3 setup.py install;
+    fi
+
 matrix:
   include:
-    - name: Lint check code (Python 3)
-      language: python
-      sudo: true
-      python:
-        - "3.6"
-        - "3.7"
-        - "3.8"
-      install:
-        - pip install -r requirements.txt
-        - pip install pylint
-      script:
-        - ./scripts/lint_check_python3.sh
-
-    - name: Test install against 3.6
-      language: python
-      sudo: true
-      python:
-        - "3.6"
-        - "3.7"
-        - "3.8"
-      script:
-        - python3 setup.py install
-
     # Source: https://medium.com/@harmittaa/travis-ci-android-example-357f6e632fc4
     # Source: https://stackoverflow.com/a/28751112/434196
     - name: Test Python 3 and Android API 16
@@ -130,7 +132,6 @@ matrix:
         # We can even run only these two tests which are not triggered below API 23
         # - python -m pytest -v tests/adbe_tests.py  --durations=0 -k test_permissions_grant_revoke
         # - python -m pytest -v tests/adbe_tests.py  --durations=0 -k test_doze
-        
 # Good .travis.yml files to learn from
 # https://github.com/ruboto/ruboto/blob/master/.travis.yml
 # https://raw.githubusercontent.com/BanzaiMan/travis_production_test/bc25099f9bd413c43cee9e7118e8eee4b1448fd6/.travis.yml
