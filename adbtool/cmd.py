@@ -1,14 +1,12 @@
 import os
-import sys
 import shlex
 import subprocess
-import math
+import sys
+
 
 # return (output, isOk)
 def call(cmd: str, printOutput=False):
-    # print("call %s" % cmd)
-    # output = None
-    # isOk = True
+    # print(f"{printOutput = }, {cmd = }")
     if sys.platform == "win32":
         args = cmd
     else:
@@ -17,14 +15,18 @@ def call(cmd: str, printOutput=False):
     try:
         if printOutput:
             isOk = subprocess.call(args) == 0
+            return None, isOk
         else:
             data = subprocess.check_output(args)
             # python3 output is bytes
             output = data.decode("utf-8")
-        return (output, isOk)
-    except subprocess.CalledProcessError as e:
-        print(e.output)
-        return (e.output, isOk)
+            return output, True
+    except subprocess.CalledProcessError as callerr:
+        print(f"{cmd = }, {callerr.output = }", file=sys.stderr)
+        return (callerr.output, False)
+    except IOError as ioerr:
+        print(f"{cmd = }, {ioerr = }", file=sys.stderr)
+        return None, False
 
 
 def getAdb():
