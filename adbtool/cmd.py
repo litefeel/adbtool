@@ -16,11 +16,11 @@ def call(cmd: str, printOutput=False):
         if printOutput:
             isOk = subprocess.call(args) == 0
             return None, isOk
-        else:
-            data = subprocess.check_output(args)
-            # python3 output is bytes
-            output = data.decode("utf-8")
-            return output, True
+
+        data = subprocess.check_output(args)
+        # python3 output is bytes
+        output = data.decode("utf-8")
+        return output, True
     except subprocess.CalledProcessError as callerr:
         print(f"cmd = {cmd}, callerr.output = {callerr.output}", file=sys.stderr)
         return (callerr.output, False)
@@ -71,3 +71,4 @@ def getAapt(vername=None):
                 return filename
 
     print("can not found aapt in ANDROID_HOME/ANDROID_SDK")
+    return None

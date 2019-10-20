@@ -21,7 +21,7 @@ class Device:
 
 
 def listOneItem(arr, index):
-    if index > 0 and index <= len(arr):
+    if 0 < index <= len(arr):
         return arr[index - 1]
     return None
 
@@ -62,9 +62,8 @@ def filterDevices(devices, args):
     if args is None:
         if len(devices) == 1:
             return devices
-        else:
-            print("devices count:%d  please set devices command" % len(devices))
-            return None
+        print("devices count:%d  please set devices command" % len(devices))
+        return None
 
     selects = []
     for arg in args:

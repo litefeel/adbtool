@@ -12,7 +12,7 @@ def get_value(key, map, default):
 def get_value_bool(key, map, default):
     if map is not None:
         value = map.get(key, default)
-        return value == "true" or value == "True" or value == True
+        return value in ("true", "True", True)
 
     return False
 
@@ -58,6 +58,7 @@ class ApkConfig:
         copy_value("apkpath", obj, self, None)
         copy_bool("run", obj, self, False)
 
+
 class InstallConfig:
     def __init__(self):
         self.apkpath = None
@@ -68,6 +69,7 @@ class InstallConfig:
         copy_value("devices", obj, self, None)
         copy_value("apkpath", obj, self, None)
         copy_bool("run", obj, self, False)
+
 
 class Config:
     def __init__(self):
