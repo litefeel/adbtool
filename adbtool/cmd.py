@@ -22,10 +22,10 @@ def call(cmd: str, printOutput=False):
             output = data.decode("utf-8")
             return output, True
     except subprocess.CalledProcessError as callerr:
-        print(f"{cmd = }, {callerr.output = }", file=sys.stderr)
+        print(f"cmd = {cmd}, callerr.output = {callerr.output}", file=sys.stderr)
         return (callerr.output, False)
     except IOError as ioerr:
-        print(f"{cmd = }, {ioerr = }", file=sys.stderr)
+        print(f"cmd = {cmd}, ioerr = {ioerr}", file=sys.stderr)
         return None, False
 
 
