@@ -14,43 +14,84 @@ A friendly android adb command-line tool
 
 
 ~~~
-adbdevice.py -h
-usage: adbdevice.py [options]
+adbt -h
+usage: adbt [options]
 
 show android device list
 
 optional arguments:
   -h, --help            show this help message and exit
-  -d DEVICES [DEVICES ...], --devices DEVICES [DEVICES ...]
-                        filter of devices, [n | serial | a] n:index of
-                        list(start with 1), serial:at least 2 char, a:all
-  -l, --list            show devices list
+  -c CONFIG, --config CONFIG
+                        global config
+  --version             show program's version number and exit
+
+sub commands:
+  {devices,push,install,apk}
+    devices             show android device list
+    push                push files to android device
+    install             install apk file
+    apk                 show apk packageName/activityName
 ~~~
 
 ---
 
 ~~~
-adbpush.py -h
-usage: adbpush.py [options] [path]
-
-push file to android device
-
-positional arguments:
-  path              file or directory
+adbt devices -h
+usage: adbt [options] devices [-h] [-d DEVICES [DEVICES ...]] [-l]
 
 optional arguments:
-  -h, --help        show this help message and exit
-  -r                recursion all file
-  -p PREFIX PREFIX  local prefix and remote prefix, will replace local prefix
-                    to remote prefix
-
+  -h, --help            show this help message and exit
+  -d DEVICES [DEVICES ...], --devices DEVICES [DEVICES ...]
+                        filter of devices, [n | serial | a] n:index of list(start with 1), serial:at least 2 char,
+                        a:all
+  -l, --list            show devices list
 ~~~
 ---
 ~~~
-apkinfo.py -h
-usage: apkinfo.py [options] apkpath
+adbt push -h
+usage: adbt [options] push [-h] [-r] [-n] [-j [HASHJSON]] [--hash [{sha1,mtime}]] [--localdir LOCALDIR]
+                           [--remotedir REMOTEDIR] [--dontpush] [-d [DEVICES [DEVICES ...]]]
+                           [path [path ...]]
 
-show apk packageName/activityName
+positional arguments:
+  path                  file or directory
+
+optional arguments:
+  -h, --help            show this help message and exit
+  -r                    recursion all file
+  -n                    only push new file by last modify files, see -j
+  -j [HASHJSON]         hash json file, default: ./$deviceMode_$deviceSerial.json
+  --hash [{sha1,mtime}]
+                        hash function: mtime or sha1, default:mtime
+  --localdir LOCALDIR   local prefix and remote prefix, will replace local prefix to remote prefix
+  --remotedir REMOTEDIR
+                        local prefix and remote prefix, will replace local prefix to remote prefix
+  --dontpush            only outout json file, not really push file to remote
+  -d [DEVICES [DEVICES ...]], --devices [DEVICES [DEVICES ...]]
+                        filter of devices, [a | n | serial] a: all devices n: index of devices list(start with 1)
+                        serial: devices serial (at least 2 char) not argument is show device list
+~~~
+---
+~~~
+adbt install -h
+usage: adbt [options] install [-h] [-f [FILTER [FILTER ...]]] [-r] [-d [DEVICES [DEVICES ...]]] [apkpath]
+
+positional arguments:
+  apkpath
+
+optional arguments:
+  -h, --help            show this help message and exit
+  -f [FILTER [FILTER ...]], --filter [FILTER [FILTER ...]]
+                        filtered by file name
+  -r, --run             run app after install
+  -d [DEVICES [DEVICES ...]], --devices [DEVICES [DEVICES ...]]
+                        filter of devices, [a | n | serial] a: all devices n: index of devices list(start with 1)
+                        serial: devices serial (at least 2 char) not argument is show device list
+~~~
+---
+~~~
+adbt apk -h
+usage: adbt [options] apk [-h] [-r] [-d [DEVICES [DEVICES ...]]] [apkpath]
 
 positional arguments:
   apkpath
@@ -59,29 +100,6 @@ optional arguments:
   -h, --help            show this help message and exit
   -r, --run             run app
   -d [DEVICES [DEVICES ...]], --devices [DEVICES [DEVICES ...]]
-                        filter of devices, [a | n | serial] a: all devices n:
-                        index of devices list(start with 1) serial: devices
-                        serial (at least 2 char) not argument is show device
-                        list
-~~~
----
-~~~
-apkinstall.py -h
-usage: apkinstall.py [options] [path]
-
-install apk file.
-
-positional arguments:
-  path
-
-optional arguments:
-  -h, --help            show this help message and exit
-  -f [FILTER [FILTER ...]], --filter [FILTER [FILTER ...]]
-                        filtered by file name
-  -r, --run             run app after install
-  -d [DEVICES [DEVICES ...]], --devices [DEVICES [DEVICES ...]]
-                        filter of devices, [a | n | serial] a: all devices n:
-                        index of devices list(start with 1) serial: devices
-                        serial (at least 2 char) not argument is show device
-                        list
+                        filter of devices, [a | n | serial] a: all devices n: index of devices list(start with 1)
+                        serial: devices serial (at least 2 char) not argument is show device list
 ~~~
