@@ -18,7 +18,7 @@ with open(_README_FILE_PATH, "r") as fh:
 setup(
     name="adbtool",
     version=version,
-    keywords=("Android", "adb"),
+    keywords=["Android", "adb"],
     description="A friendly android adb command-line tool",
     long_description=long_description,
     license="MIT Licence",
