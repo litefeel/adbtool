@@ -29,7 +29,7 @@ def getApks(path, filters):
 def getNewst(apks):
     if len(apks) == 0:
         return None
-    apks = sorted(apks, key=lambda fa: os.path.getmtime(fa), reverse=True)
+    apks = sorted(apks, key=os.path.getmtime, reverse=True)
     return apks[0]
 
 
