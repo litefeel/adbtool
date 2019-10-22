@@ -22,7 +22,7 @@ setup(
     description="A friendly android adb command-line tool",
     long_description=long_description,
     long_description_content_type="text/markdown",
-    license="MIT Licence",
+    license="MIT",
     url="https://github.com/litefeel/adbtool",
     author="litefeel",
     author_email="litefeel@gmail.com",

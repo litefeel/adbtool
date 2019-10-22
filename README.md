@@ -2,7 +2,8 @@
 A friendly android adb command-line tool
 
 [![Build Status](https://travis-ci.com/litefeel/adbtool.svg?branch=master)](https://travis-ci.com/litefeel/adbtool)
-[![Software License](https://img.shields.io/github/license/mashape/apistatus.svg)](https://github.com/litefeel/adbtool/blob/master/LICENSE)
+[![PyPI](https://img.shields.io/pypi/v/adbtool.svg)](https://pypi.org/project/adbtool/)
+[![PyPI](https://img.shields.io/pypi/l/adbtool.svg)](https://pypi.org/project/adbtool/)
 
 
 ### Python Requirements
