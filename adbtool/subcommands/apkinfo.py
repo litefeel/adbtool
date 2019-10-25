@@ -25,7 +25,7 @@ def parse(apk):
     return None
 
 
-def docommand(args, cfg: Config):
+def docommand(args: argparse.Namespace, cfg: Config) -> None:
     isOk, serials, _ = adbdevice.doArgumentParser(args)
     if isOk:
         exit(0)
@@ -52,7 +52,7 @@ def docommand(args, cfg: Config):
         print(activity)
 
 
-def addcommand(parser: argparse.ArgumentParser):
+def addcommand(parser: argparse.ArgumentParser) -> None:
     parser.add_argument("-r", "--run", action="store_true", help="run app")
     parser.add_argument("apkpath", nargs="?")
     adbdevice.addArgumentParser(parser)

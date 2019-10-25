@@ -35,7 +35,7 @@ def file_mtime(file: str) -> str:
     return str(os.path.getmtime(push_cfg.localdir))
 
 
-def load_json(filename):
+def load_json(filename: str) -> Dict:
     if filename is None:
         return {}
     if os.path.exists(filename):
@@ -43,7 +43,7 @@ def load_json(filename):
     return {}
 
 
-def pull(file: str, prefixLocal, prefixRemote):
+def pull(file: str, prefixLocal: str, prefixRemote: str) -> bool:
     file = file.replace("\\", "/")
     local = file
     remote = file
@@ -56,7 +56,7 @@ def pull(file: str, prefixLocal, prefixRemote):
     return isOk
 
 
-def push(file: str, prefixLocal, prefixRemote, dontpush):
+def push(file: str, prefixLocal: str, prefixRemote: str, dontpush: bool) -> None:
     file = file.replace("\\", "/")
     local = file
     remote = file
@@ -95,7 +95,7 @@ def walkPush(path, prefixLocal, prefixRemote, dontpush):
             push("%s/%s" % (root, f), prefixLocal, prefixRemote, dontpush)
 
 
-def push_all(cfg: PushConfig, serial, hashjson):
+def push_all(cfg: PushConfig, serial: str, hashjson: str) -> None:
     global g_serial, date_dict
     g_serial = serial
     errors.clear()
@@ -133,7 +133,7 @@ def push_all(cfg: PushConfig, serial, hashjson):
         map(print, errors)
 
 
-def docommand(args, cfg: Config):
+def docommand(args: argparse.Namespace, cfg: Config) -> None:
     isOk, serials, devices = adbdevice.doArgumentParser(args)
     if isOk:
         exit(0)
@@ -169,7 +169,7 @@ def docommand(args, cfg: Config):
         push_all(push_cfg, device.serial, hashjson)
 
 
-def addcommand(parser: argparse.ArgumentParser):
+def addcommand(parser: argparse.ArgumentParser) -> None:
     parser.add_argument(
         "-r", dest="recursion", action="store_true", help="recursion all file"
     )

@@ -2,10 +2,11 @@ import os
 import shlex
 import subprocess
 import sys
+from typing import List, Tuple
 
 
 # return (output, isOk)
-def call(cmd: str, printOutput=False):
+def call(cmd: str, printOutput: bool = False) -> Tuple[str, bool]:
     # print(f"{printOutput = }, {cmd = }")
     if sys.platform == "win32":
         args = cmd
@@ -15,7 +16,7 @@ def call(cmd: str, printOutput=False):
     try:
         if printOutput:
             isOk = subprocess.call(args) == 0
-            return None, isOk
+            return "", isOk
 
         data = subprocess.check_output(args)
         # python3 output is bytes
@@ -26,10 +27,10 @@ def call(cmd: str, printOutput=False):
         return (callerr.output, False)
     except IOError as ioerr:
         print(f"cmd = {cmd}, ioerr = {ioerr}", file=sys.stderr)
-        return None, False
+        return "", False
 
 
-def getAdb():
+def getAdb() -> str:
     androidHome = os.getenv("ANDROID_HOME")
     if androidHome is None:
         androidHome = os.getenv("ANDROID_SDK")
@@ -40,7 +41,7 @@ def getAdb():
     return os.path.join(androidHome, "platform-tools/adb")
 
 
-def versionnum(a: str):
+def versionnum(a: str) -> int:
     arr = a.split(".")
     arr.reverse()
     multiple = 1
@@ -51,7 +52,7 @@ def versionnum(a: str):
     return n
 
 
-def getAapt(vername=None):
+def getAapt() -> str:
     androidHome = os.getenv("ANDROID_HOME")
     if androidHome is None:
         androidHome = os.getenv("ANDROID_SDK")
@@ -71,4 +72,4 @@ def getAapt(vername=None):
                 return filename
 
     print("can not found aapt in ANDROID_HOME/ANDROID_SDK")
-    return None
+    return ""

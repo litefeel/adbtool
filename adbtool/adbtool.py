@@ -1,7 +1,8 @@
 import argparse
 import os
 import sys
-from typing import List
+from argparse import _SubParsersAction
+from typing import Any, List
 
 from litefeel.pycommon.io import read_file
 
@@ -11,27 +12,29 @@ from .subcommands import adbdevice, adbpush, apkinfo, apkinstall
 _VERSION_FILE_NAME = "version.txt"
 
 
-def get_version():
+def get_version() -> str:
     dir_of_this_script = os.path.split(__file__)[0]
     version_file_path = os.path.join(dir_of_this_script, _VERSION_FILE_NAME)
     return read_file(version_file_path).strip()
 
 
 class Command:
-    def __init__(self, name: str, command, help):
+    def __init__(self, name: str, command: Any, help: str):
         self.name = name
         self.command = command
         self.help = help
 
 
-def addsubcommands(subparser: argparse._SubParsersAction, commands: List[Command]):
+def addsubcommands(
+    subparser: argparse._SubParsersAction, commands: List[Command]
+) -> None:
     for cmd in commands:
         parser = subparser.add_parser(cmd.name, help=cmd.help)
         parser.set_defaults(docommand=cmd.command.docommand)
         cmd.command.addcommand(parser)
 
 
-def add_global_params(parser: argparse.ArgumentParser):
+def add_global_params(parser: argparse.ArgumentParser) -> None:
     parser.add_argument("-c", "--config", dest="config", help="global config")
     parser.add_argument(
         "--version", action="version", version=f"%(prog)s {get_version()}"
