@@ -1,9 +1,10 @@
-from litefeel.pycommon.io import read_file
 import yaml
+from litefeel.pycommon.io import read_file
 from var_dump import var_dump
+from typing import Any, Dict
 
 
-def get_value(key, map, default):
+def get_value(key: str, map: Dict[str, str], default: Any) -> Any:
     if map is not None:
         return map.get(key, default)
     return None
@@ -27,7 +28,7 @@ def copy_value(key, map, obj, default=None):
     setattr(obj, key, value)
 
 
-def copy_subconfig(key, map, subconfig):
+def copy_subconfig(key: str, map: Any, subconfig: Any) -> None:
     value = get_value(key, map, None)
     if value is not None:
         subconfig.load(value)
@@ -77,7 +78,7 @@ class Config:
         self.apk = ApkConfig()
         self.install = InstallConfig()
 
-    def load(self, obj):
+    def load(self, obj: Any) -> None:
         copy_subconfig("push", obj, self.push)
         copy_subconfig("apk", obj, self.apk)
         copy_subconfig("install", obj, self.install)
@@ -87,10 +88,3 @@ class Config:
         obj = yaml.load(data, Loader=yaml.loader.BaseLoader)
         # var_dump(obj)
         self.load(obj)
-
-
-if __name__ == "__main__":
-    cfg = Config()
-    cfg.load_config("tests/config.yml")
-    var_dump(cfg)
-

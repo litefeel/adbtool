@@ -41,7 +41,7 @@ def add_global_params(parser: argparse.ArgumentParser) -> None:
     )
 
 
-def main(args=None):
+def main(_args: List[str] = None) -> None:
     parser = argparse.ArgumentParser(
         usage="%(prog)s [options]", description="show android device list"
     )
@@ -58,7 +58,7 @@ def main(args=None):
     subparser = parser.add_subparsers(title="sub commands", dest="subcommand")
     addsubcommands(subparser, commands)
 
-    args = parser.parse_args(args)
+    args = parser.parse_args(_args)
     if args.subcommand is None:
         parser.print_help()
         exit(0)
