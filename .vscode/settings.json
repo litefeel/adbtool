@@ -1,17 +1,28 @@
 {
     "python.formatting.provider": "black",
     "python.linting.mypyEnabled": true,
-    "python.linting.pylintEnabled": false,
+    "python.testing.pytestEnabled": true,
     "python.testing.pytestArgs": [
         "tests"
     ],
-    "python.testing.unittestEnabled": false,
-    "python.testing.pytestEnabled": true,
-    "python.testing.nosetestsEnabled": false,
     "files.exclude": {
         "**/__pycache__": true,
         "**/.mypy_cache": true,
         "**/.pytest_cache": true
     },
-    "python.linting.enabled": true
+    "python.linting.enabled": true,
+    "git.alwaysShowStagedChangesResourceGroup": true,
+    "python.linting.mypyArgs": [
+        "--ignore-missing-imports",
+        "--follow-imports=silent",
+        "--disallow-incomplete-defs",
+        // "--disallow-untyped-calls",
+        "--show-column-numbers"
+        // "--strict",
+        // "--disallow-untyped-defs"
+    ],
+    "python.linting.pylintUseMinimalCheckers": false,
+    "python.analysis.memory.keepLibraryLocalVariables": true,
+    "python.analysis.openFilesOnly": false,
+    "python.autoComplete.addBrackets": true
 }
