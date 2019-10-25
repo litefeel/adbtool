@@ -125,7 +125,7 @@ def doArgumentParser(args):
     return (False, serials, devices)
 
 
-def docommand(args, cfg: Config):
+def docommand(args: argparse.Namespace, cfg: Config) -> None:
     if args.list:
         printDevices(getDevices())
         exit(0)
@@ -136,7 +136,7 @@ def docommand(args, cfg: Config):
 
 ##### end for other script
 # -------------- main ----------------
-def addcommand(parser: argparse.ArgumentParser):
+def addcommand(parser: argparse.ArgumentParser) -> None:
     parser.add_argument(
         "-d",
         "--devices",

@@ -82,7 +82,7 @@ class Config:
         copy_subconfig("apk", obj, self.apk)
         copy_subconfig("install", obj, self.install)
 
-    def load_config(self, filename: str):
+    def load_config(self, filename: str) -> None:
         data = read_file(filename)
         obj = yaml.load(data, Loader=yaml.loader.BaseLoader)
         # var_dump(obj)

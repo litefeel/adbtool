@@ -1,6 +1,7 @@
 import argparse
 import os
 import sys
+from typing import List
 
 from ..cmd import call, getAdb
 from ..config import Config
@@ -44,7 +45,7 @@ def filterApks(fileorpath, filters):
     return apk
 
 
-def install(apks, serials, run: bool):
+def install(apks: List[str], serials: List[str], run: bool) -> None:
     adb = getAdb()
     last = len(apks) - 1
     for i in range(0, len(apks)):
@@ -60,7 +61,7 @@ def install(apks, serials, run: bool):
                 call(cmd)
 
 
-def docommand(args, cfg: Config):
+def docommand(args: argparse.Namespace, cfg: Config) -> None:
     isOk, serials, devices = adbdevice.doArgumentParser(args)
     if isOk:
         exit(0)
@@ -74,7 +75,7 @@ def docommand(args, cfg: Config):
         install([apks], serials, args.run or cfg.install.run)
 
 
-def addcommand(parser: argparse.ArgumentParser):
+def addcommand(parser: argparse.ArgumentParser) -> None:
     parser.add_argument("-f", "--filter", nargs="*", help="filtered by file name")
     parser.add_argument(
         "-r", "--run", action="store_true", help="run app after install"
