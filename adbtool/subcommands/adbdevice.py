@@ -1,5 +1,6 @@
 import argparse
 import sys
+from typing import List
 
 from ..cmd import call, getAdb
 from ..config import Config
@@ -10,7 +11,7 @@ class Device:
 
     __slots__ = ("serial", "online", "product", "model", "device", "raw")
 
-    def __init__(self, line):
+    def __init__(self, line:str):
         self.raw = line
         arr = line.split()
         self.serial = arr[0]
@@ -25,10 +26,9 @@ def listOneItem(arr, index):
         return arr[index - 1]
     return None
 
-
-def getDevices():
+def get_devices()->List[Device]:
     output, isOk = call("%s devices -l" % getAdb())
-    devices = []
+    devices:List[Device] = []
     if isOk:
         output = output.replace("\r\n", "\n").strip()
         lines = output.split("\n")
@@ -115,7 +115,7 @@ def addArgumentParser(parser):
 
 
 def doArgumentParser(args):
-    devices = getDevices()
+    devices = get_devices()
     if args.devices is not None and len(args.devices) == 0:
         printDevices(devices)
         return (True, None)
@@ -127,10 +127,10 @@ def doArgumentParser(args):
 
 def docommand(args: argparse.Namespace, cfg: Config) -> None:
     if args.list:
-        printDevices(getDevices())
+        printDevices(get_devices())
         exit(0)
 
-    devices = filterDevices(getDevices(), args.devices)
+    devices = filterDevices(get_devices(), args.devices)
     printDevices(devices)
 
 
