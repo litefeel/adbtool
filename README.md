@@ -1,7 +1,7 @@
 # Adbtool
 A friendly android adb command-line tool
 
-[![Build Status](https://travis-ci.com/litefeel/adbtool.svg?branch=master)](https://travis-ci.com/litefeel/adbtool)
+[![Test 😎](https://github.com/litefeel/adbtool/workflows/Test%20%F0%9F%98%8E/badge.svg)](https://github.com/litefeel/adbtool/actions)
 [![PyPI](https://img.shields.io/pypi/v/adbtool.svg)](https://pypi.org/project/adbtool/)
 [![PyPI](https://img.shields.io/pypi/l/adbtool.svg)](https://pypi.org/project/adbtool/)
 
