@@ -8,7 +8,7 @@ A friendly android adb command-line tool
 
 ### Python Requirements
 * python 3.6+
-* litefeel-pycommon
+* Android SDK
 
 
 ### Commands
