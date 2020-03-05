@@ -65,3 +65,4 @@ def getAapt() -> str:
                 return filename
 
     raise_error("can not found aapt in ANDROID_HOME/ANDROID_SDK")
+    return ""
