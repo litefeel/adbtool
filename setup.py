@@ -29,7 +29,7 @@ setup(
     packages=find_packages(exclude=["test", "tests"]),
     include_package_data=True,
     platforms="any",
-    install_requires=["litefeel-pycommon", "PyYAML"],
+    install_requires=["litefeel-pycommon", "PyYAML", "semantic_version"],
     scripts=[],
     entry_points={"console_scripts": ["adbt = adbtool.adbtool:main"]},
     # See https://pypi.python.org/pypi?%3Aaction=list_classifiers

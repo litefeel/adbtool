@@ -4,6 +4,10 @@ import subprocess
 import sys
 from typing import List, Tuple
 
+from semantic_version import Version
+
+from .errors import raise_error
+
 
 # return (output, isOk)
 def call(cmd: str, printOutput: bool = False) -> Tuple[str, bool]:
@@ -41,17 +45,6 @@ def getAdb() -> str:
     return os.path.join(androidHome, "platform-tools/adb")
 
 
-def versionnum(a: str) -> int:
-    arr = a.split(".")
-    arr.reverse()
-    multiple = 1
-    n = 0
-    for i in range(0, min(len(arr), 3)):
-        n += int(arr[i]) * multiple
-        multiple *= 1000
-    return n
-
-
 def getAapt() -> str:
     androidHome = os.getenv("ANDROID_HOME")
     if androidHome is None:
@@ -64,12 +57,11 @@ def getAapt() -> str:
 
     buildtools = os.path.join(androidHome, "build-tools")
     if os.path.isdir(buildtools):
-        dirs = os.listdir(buildtools)
-        dirs.sort(reverse=True, key=versionnum)
-        for dir in dirs:
-            filename = os.path.join(buildtools, dir, aaptname)
+        vers = list(map(lambda v: Version(v), os.listdir(buildtools)))
+        vers.sort(reverse=True)
+        for ver in vers:
+            filename = os.path.join(buildtools, str(ver), aaptname)
             if os.path.isfile(filename):
                 return filename
 
-    print("can not found aapt in ANDROID_HOME/ANDROID_SDK")
-    return ""
+    raise_error("can not found aapt in ANDROID_HOME/ANDROID_SDK")

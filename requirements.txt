@@ -2,3 +2,4 @@ litefeel-pycommon
 PyYAML
 var_dump
 pytest
+semantic_version
