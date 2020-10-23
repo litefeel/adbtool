@@ -2,7 +2,7 @@ import argparse
 import hashlib
 import json
 import os
-from typing import Callable, Dict
+from typing import Callable
 
 from litefeel.pycommon.io import read_file, write_file
 
@@ -11,7 +11,7 @@ from ..config import Config, PushConfig
 from . import adbdevice
 
 
-date_dict: Dict[str, str] = {}
+date_dict: dict[str, str] = {}
 g_serial = ""
 hashfunc: Callable[[str], str]
 errors = []
@@ -35,7 +35,7 @@ def file_mtime(file: str) -> str:
     return str(os.path.getmtime(push_cfg.localdir))
 
 
-def load_json(filename: str) -> Dict:
+def load_json(filename: str) -> dict:
     if filename is None:
         return {}
     if os.path.exists(filename):
@@ -141,7 +141,6 @@ def docommand(args: argparse.Namespace, cfg: Config) -> None:
     global push_cfg
 
     push_cfg = cfg.push
-    global hashfunc
 
     if args.dontpush:
         push_cfg.dontpush = True
@@ -161,6 +160,7 @@ def docommand(args: argparse.Namespace, cfg: Config) -> None:
     if len(push_cfg.paths) == 0:
         push_cfg.paths = ["."]
 
+    global hashfunc
     hashfunc = file_mtime if args.hash == "mtime" else file_sha1
 
     for device in devices:

@@ -1,7 +1,6 @@
 import argparse
 import os
-import sys
-from typing import List, Optional
+from typing import Optional
 
 from ..cmd import call, getAdb
 from ..config import Config
@@ -46,7 +45,7 @@ def filterApks(fileorpath: str, filters) -> Optional[str]:
     return apk
 
 
-def install(apks: List[str], serials: List[str], run: bool) -> None:
+def install(apks: list[str], serials: list[str], run: bool) -> None:
     adb = getAdb()
     last = len(apks) - 1
     for i in range(0, len(apks)):

@@ -1,7 +1,7 @@
 import argparse
 import os
 from argparse import _SubParsersAction
-from typing import Any, List
+from typing import Any
 
 from litefeel.pycommon.io import read_file
 
@@ -24,9 +24,7 @@ class Command:
         self.help = help
 
 
-def addsubcommands(
-    subparser: argparse._SubParsersAction, commands: List[Command]
-) -> None:
+def addsubcommands(subparser: argparse._SubParsersAction, commands: list[Command]):
     for cmd in commands:
         parser = subparser.add_parser(cmd.name, help=cmd.help)
         parser.set_defaults(docommand=cmd.command.docommand)
@@ -40,7 +38,7 @@ def add_global_params(parser: argparse.ArgumentParser) -> None:
     )
 
 
-def main(_args: List[str] = None) -> None:
+def main(_args=None):
     parser = argparse.ArgumentParser(
         usage="%(prog)s [options]", description="show android device list"
     )

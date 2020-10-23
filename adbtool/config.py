@@ -1,16 +1,16 @@
 import yaml
 from litefeel.pycommon.io import read_file
 from var_dump import var_dump
-from typing import Any, Dict
+from typing import Any
 
 
-def get_value(key: str, map: Dict[str, str], default: Any) -> Any:
+def get_value(key: str, map: dict[str, str], default: Any) -> Any:
     if map is not None:
         return map.get(key, default)
     return None
 
 
-def get_value_bool(key, map, default):
+def get_value_bool(key, map, default) -> bool:
     if map is not None:
         value = map.get(key, default)
         return value in ("true", "True", True)

@@ -1,6 +1,4 @@
 import argparse
-import sys
-from typing import List, Tuple, Optional
 
 from ..cmd import call, getAdb
 from ..config import Config
@@ -31,7 +29,7 @@ def listOneItem(arr, index):
 
 def get_devices() -> list[Device]:
     output, isOk = call("%s devices -l" % getAdb())
-    devices: list[Device] = list[Device]()
+    devices: list[Device] = []
     if isOk:
         output = output.replace("\r\n", "\n").strip()
         lines = output.split("\n")
@@ -53,7 +51,7 @@ def getDevicesBySerial(devices, serial):
 
 # return
 #   List: matched devices
-def filterDevices(devices, args) -> List[Device]:
+def filterDevices(devices: list[Device], args) -> list[Device]:
     if len(devices) == 0:
         print("No devices connected")
         return []
@@ -64,7 +62,7 @@ def filterDevices(devices, args) -> List[Device]:
         print("devices count:%d  please set devices command" % len(devices))
         return devices[:]
 
-    selects = []
+    selects: list[Device] = []
     for arg in args:
         device = None
         if len(arg) == 1:
@@ -83,7 +81,7 @@ def filterDevices(devices, args) -> List[Device]:
     return selects
 
 
-def printDevices(devices):
+def printDevices(devices: list[Device]):
     if devices is None:
         return
     for i in range(len(devices)):
@@ -111,7 +109,7 @@ def addArgumentParser(parser):
     )
 
 
-def doArgumentParser(args) -> tuple[List[str], List[Device]]:
+def doArgumentParser(args) -> tuple[list[str], list[Device]]:
     devices = get_devices()
     if args.devices is not None and len(args.devices) == 0:
         printDevices(devices)
