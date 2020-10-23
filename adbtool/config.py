@@ -85,6 +85,6 @@ class Config:
 
     def load_config(self, filename: str) -> None:
         data = read_file(filename)
-        obj = yaml.load(data, Loader=yaml.loader.BaseLoader)
+        obj = yaml.load(data, Loader=yaml.BaseLoader)
         # var_dump(obj)
         self.load(obj)
