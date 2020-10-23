@@ -26,10 +26,6 @@ def parse(apk):
 
 
 def docommand(args: argparse.Namespace, cfg: Config) -> None:
-    serials, _ = adbdevice.doArgumentParser(args)
-    if not serials:
-        exit(0)
-
     if args.apkpath is not None:
         cfg.apk.apkpath = args.apkpath
 
@@ -43,7 +39,8 @@ def docommand(args: argparse.Namespace, cfg: Config) -> None:
         return
 
     activity = parse(apkpath)
-    if args.run and serials is not None:
+    if args.run:
+        serials, _ = adbdevice.doArgumentParser(args)
         adb = getAdb()
         for serial in serials:
             cmd = '%s -s %s shell am start -S "%s"' % (adb, serial, activity)
