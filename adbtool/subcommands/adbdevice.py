@@ -111,15 +111,15 @@ def addArgumentParser(parser):
     )
 
 
-def doArgumentParser(args) -> Tuple[bool, List[str], List[Device]]:
+def doArgumentParser(args) -> tuple[List[str], List[Device]]:
     devices = get_devices()
     if args.devices is not None and len(args.devices) == 0:
         printDevices(devices)
-        return (True, [], [])
+        return ([], [])
 
     devices = filterDevices(devices, args.devices)
     serials = getSerials(devices)
-    return (False, serials, devices)
+    return (serials, devices)
 
 
 def docommand(args: argparse.Namespace, cfg: Config) -> None:

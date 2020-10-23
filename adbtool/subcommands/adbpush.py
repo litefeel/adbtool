@@ -134,8 +134,8 @@ def push_all(cfg: PushConfig, serial: str, hashjson: str) -> None:
 
 
 def docommand(args: argparse.Namespace, cfg: Config) -> None:
-    isOk, serials, devices = adbdevice.doArgumentParser(args)
-    if isOk:
+    serials, devices = adbdevice.doArgumentParser(args)
+    if not serials:
         exit(0)
 
     global push_cfg

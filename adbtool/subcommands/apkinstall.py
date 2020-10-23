@@ -63,8 +63,8 @@ def install(apks: List[str], serials: List[str], run: bool) -> None:
 
 
 def docommand(args: argparse.Namespace, cfg: Config) -> None:
-    isOk, serials, devices = adbdevice.doArgumentParser(args)
-    if isOk:
+    serials, devices = adbdevice.doArgumentParser(args)
+    if not serials:
         exit(0)
 
     path = args.apkpath or cfg.install.apkpath or "."

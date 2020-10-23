@@ -26,8 +26,8 @@ def parse(apk):
 
 
 def docommand(args: argparse.Namespace, cfg: Config) -> None:
-    isOk, serials, _ = adbdevice.doArgumentParser(args)
-    if isOk:
+    serials, _ = adbdevice.doArgumentParser(args)
+    if not serials:
         exit(0)
 
     if args.apkpath is not None:
