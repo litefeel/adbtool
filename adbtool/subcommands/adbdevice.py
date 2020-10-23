@@ -1,9 +1,11 @@
 import argparse
 import sys
-from typing import List
+from typing import List, Tuple, Optional
 
 from ..cmd import call, getAdb
 from ..config import Config
+
+_IGNORE_PREFIXS = ("List of devices attached", "* daemon")
 
 
 class Device:
@@ -11,7 +13,7 @@ class Device:
 
     __slots__ = ("serial", "online", "product", "model", "device", "raw")
 
-    def __init__(self, line:str):
+    def __init__(self, line: str):
         self.raw = line
         arr = line.split()
         self.serial = arr[0]
@@ -26,16 +28,17 @@ def listOneItem(arr, index):
         return arr[index - 1]
     return None
 
-def get_devices()->List[Device]:
+
+def get_devices() -> list[Device]:
     output, isOk = call("%s devices -l" % getAdb())
-    devices:List[Device] = []
+    devices: list[Device] = list[Device]()
     if isOk:
         output = output.replace("\r\n", "\n").strip()
         lines = output.split("\n")
         if len(lines) > 1:
             # skip first line "List of devices attached"
-            for line in lines[1:]:
-                if len(line) > 0:
+            for line in lines:
+                if not line.startswith(_IGNORE_PREFIXS):
                     devices.append(Device(line))
     devices.sort(key=lambda x: x.serial.lower())
     return devices
@@ -49,28 +52,24 @@ def getDevicesBySerial(devices, serial):
 
 
 # return
-#   None: 1. no devices connected
-#         2. filter can not match unique device
-#         3. not filter but has more than devices
-#   Empty List: can not match devices
 #   List: matched devices
-def filterDevices(devices, args):
+def filterDevices(devices, args) -> List[Device]:
     if len(devices) == 0:
         print("No devices connected")
-        return None
+        return []
 
     if args is None:
         if len(devices) == 1:
-            return devices
+            return devices[:]
         print("devices count:%d  please set devices command" % len(devices))
-        return None
+        return devices[:]
 
     selects = []
     for arg in args:
         device = None
         if len(arg) == 1:
             if arg == "a":
-                return devices
+                return devices[:]
             device = listOneItem(devices, int(arg))
         elif len(arg) >= 2:
             tmp = getDevicesBySerial(devices, arg)
@@ -78,10 +77,10 @@ def filterDevices(devices, args):
                 device = tmp[0]
             elif len(tmp) > 1:
                 print("serial prefix %s is not unique" % arg)
-                return None
+                return []
         if device is not None:
             selects.append(device)
-    return selects if len(selects) > 0 else None
+    return selects
 
 
 def printDevices(devices):
@@ -92,13 +91,11 @@ def printDevices(devices):
 
 
 ##### for other script
-def getSerials(devices):
-    if devices is not None:
-        serials = []
-        for d in devices:
-            serials.append(d.serial)
-        return serials
-    return None
+def getSerials(devices: list[Device]) -> list[str]:
+    serials = []
+    for d in devices:
+        serials.append(d.serial)
+    return serials
 
 
 def addArgumentParser(parser):
@@ -114,11 +111,11 @@ def addArgumentParser(parser):
     )
 
 
-def doArgumentParser(args):
+def doArgumentParser(args) -> Tuple[bool, List[str], List[Device]]:
     devices = get_devices()
     if args.devices is not None and len(args.devices) == 0:
         printDevices(devices)
-        return (True, None)
+        return (True, [], [])
 
     devices = filterDevices(devices, args.devices)
     serials = getSerials(devices)

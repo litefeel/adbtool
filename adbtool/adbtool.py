@@ -1,6 +1,5 @@
 import argparse
 import os
-import sys
 from argparse import _SubParsersAction
 from typing import Any, List
 

@@ -2,7 +2,6 @@ import os
 import shlex
 import subprocess
 import sys
-from typing import List, Tuple
 
 from semantic_version import Version
 
@@ -10,7 +9,7 @@ from .errors import raise_error
 
 
 # return (output, isOk)
-def call(cmd: str, printOutput: bool = False) -> Tuple[str, bool]:
+def call(cmd: str, printOutput: bool = False) -> tuple[str, bool]:
     # print(f"{printOutput = }, {cmd = }")
     if sys.platform == "win32":
         args = cmd

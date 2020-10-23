@@ -1,7 +1,7 @@
 import argparse
 import os
 import sys
-from typing import List
+from typing import List, Optional
 
 from ..cmd import call, getAdb
 from ..config import Config
@@ -27,15 +27,16 @@ def getApks(path, filters):
     return list(apks)
 
 
-def getNewst(apks):
+def getNewst(apks: list[str]) -> Optional[str]:
     if len(apks) == 0:
         return None
     apks = sorted(apks, key=os.path.getmtime, reverse=True)
     return apks[0]
 
 
-def filterApks(fileorpath, filters):
+def filterApks(fileorpath: str, filters) -> Optional[str]:
     apk = fileorpath
+
     if os.path.isdir(fileorpath):
         apks = getApks(fileorpath, filters)
         if len(apks) == 0:
