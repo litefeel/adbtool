@@ -56,9 +56,7 @@ def install(apks: list[str], serials: list[str], run: bool) -> None:
             _, isOk = call(cmd, True)
             print(isOk)
             if isOk and isrun:
-                activity = apkinfo.parse(apk)
-                cmd = '%s -s %s shell am start -S "%s"' % (adb, serial, activity)
-                call(cmd)
+                apkinfo.run(apk, [serial])
 
 
 def docommand(args: argparse.Namespace, cfg: Config) -> None:

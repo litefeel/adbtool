@@ -1,4 +1,5 @@
 import argparse
+from os import error
 import os.path
 import re
 
@@ -21,8 +22,29 @@ def parse(apk):
         activityname = firstitem(
             re.findall(r"launchable-activity: name='(\S+?)'", output)
         )
-        return "%s/%s" % (packagename, activityname)
-    return None
+        return (packagename, activityname)
+    return (None, None)
+
+
+def stop(apk, serials):
+    packagename, _ = parse(apk)
+    adb = getAdb()
+    for serial in serials:
+        cmd = '%s -s %s shell am force-stop "%s"' % (adb, serial, packagename)
+        call(cmd)
+
+
+def run(apk, serials):
+    packagename, activityname = parse(apk)
+    adb = getAdb()
+    for serial in serials:
+        cmd = '%s -s %s shell am start -S "%s/%s"' % (
+            adb,
+            serial,
+            packagename,
+            activityname,
+        )
+        call(cmd)
 
 
 def docommand(args: argparse.Namespace, cfg: Config) -> None:
@@ -38,18 +60,20 @@ def docommand(args: argparse.Namespace, cfg: Config) -> None:
         raise_error("apkpath is not file")
         return
 
-    activity = parse(apkpath)
     if args.run:
         serials, _ = adbdevice.doArgumentParser(args)
-        adb = getAdb()
-        for serial in serials:
-            cmd = '%s -s %s shell am start -S "%s"' % (adb, serial, activity)
-            call(cmd)
+        run(apkpath, serials)
+    elif args.stop:
+        serials, _ = adbdevice.doArgumentParser(args)
+        stop(apkpath, serials)
     else:
-        print(activity)
+        packagename, activityname = parse(apkpath)
+        print(f"{packagename}/{activityname}")
 
 
 def addcommand(parser: argparse.ArgumentParser) -> None:
-    parser.add_argument("-r", "--run", action="store_true", help="run app")
+    group = parser.add_mutually_exclusive_group()
+    group.add_argument("-r", "--run", action="store_true", help="run app")
+    group.add_argument("-s", "--stop", action="store_true", help="run app")
     parser.add_argument("apkpath", nargs="?")
     adbdevice.addArgumentParser(parser)
