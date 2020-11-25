@@ -10,7 +10,6 @@ from ..cmd import call, getAdb
 from ..config import Config, PushConfig
 from . import adbdevice
 
-
 date_dict: dict[str, str] = {}
 g_serial = ""
 hashfunc: Callable[[str], str]
@@ -133,6 +132,25 @@ def push_all(cfg: PushConfig, serial: str, hashjson: str) -> None:
         map(print, errors)
 
 
+def _is_relpath(path, root):
+    if not path.startswith(root):
+        return False
+    if len(path) == len(root):
+        return True
+    return path[len(root)] == "/"
+
+
+def _normal_path(p, root):
+    if os.path.isabs(p):
+        p = p.replace("\\", "/")
+    else:
+        p = os.path.abspath(p).replace("\\", "/")
+        if not _is_relpath(p, root):
+            p = os.path.join(root, p)
+    p = os.path.abspath(p).replace("\\", "/")
+    return p if os.path.exists(p) and _is_relpath(p, root) else None
+
+
 def docommand(args: argparse.Namespace, cfg: Config) -> None:
     serials, devices = adbdevice.doArgumentParser(args)
     if not serials:
@@ -154,11 +172,9 @@ def docommand(args: argparse.Namespace, cfg: Config) -> None:
     if args.recursion:
         push_cfg.recursion = True
 
-    paths = args.path[:]
-    if len(paths) > 0:
-        push_cfg.paths = paths
-    if len(push_cfg.paths) == 0:
-        push_cfg.paths = ["."]
+    paths = args.path[:] or push_cfg.paths or ["."]
+    paths = [_normal_path(p, push_cfg.localdir) for p in paths]
+    push_cfg.paths = [p for p in paths if p]
 
     global hashfunc
     hashfunc = file_mtime if args.hash == "mtime" else file_sha1
