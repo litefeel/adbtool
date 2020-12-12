@@ -6,7 +6,7 @@ from typing import Any
 from litefeel.pycommon.io import read_file
 
 from .config import Config
-from .subcommands import adbdevice, adbpush, apkinfo, apkinstall
+from .subcommands import adbdevice, adbpush, apkinfo, apkinstall, apkuninstall
 
 _VERSION_FILE_NAME = "version.txt"
 
@@ -49,6 +49,7 @@ def main(_args=None):
         Command("devices", adbdevice, "show android device list"),
         Command("push", adbpush, "push files to android device"),
         Command("install", apkinstall, "install apk file"),
+        Command("uninstall", apkuninstall, "uninstall apk file"),
         Command("apk", apkinfo, "show apk packageName/activityName"),
     ]
 
