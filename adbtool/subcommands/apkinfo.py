@@ -22,12 +22,12 @@ def parse(apk):
         activityname = firstitem(
             re.findall(r"launchable-activity: name='(\S+?)'", output)
         )
-        return (packagename, activityname)
-    return (None, None)
+        return (packagename, activityname, output)
+    return (None, None, None)
 
 
 def stop(apk, serials):
-    packagename, _ = parse(apk)
+    packagename, _, _ = parse(apk)
     adb = getAdb()
     for serial in serials:
         cmd = '%s -s %s shell am force-stop "%s"' % (adb, serial, packagename)
@@ -35,7 +35,7 @@ def stop(apk, serials):
 
 
 def run(apk, serials):
-    packagename, activityname = parse(apk)
+    packagename, activityname, _ = parse(apk)
     adb = getAdb()
     for serial in serials:
         cmd = '%s -s %s shell am start -S "%s/%s"' % (
@@ -67,8 +67,8 @@ def docommand(args: argparse.Namespace, cfg: Config) -> None:
         serials, _ = adbdevice.doArgumentParser(args)
         stop(apkpath, serials)
     else:
-        packagename, activityname = parse(apkpath)
-        print(f"{packagename}/{activityname}")
+        packagename, activityname, output = parse(apkpath)
+        print(output)
 
 
 def addcommand(parser: argparse.ArgumentParser) -> None:

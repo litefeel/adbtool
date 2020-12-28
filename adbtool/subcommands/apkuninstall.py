@@ -50,7 +50,7 @@ def uninstall(apks: list[str], serials: list[str]) -> None:
     last = len(apks) - 1
     for i in range(0, len(apks)):
         apk = apks[i]
-        package, _ = apkinfo.parse(apk)
+        package, _, _ = apkinfo.parse(apk)
         for serial in serials:
             cmd = '%s -s %s uninstall "%s"' % (adb, serial, package)
             _, isOk = call(cmd, True)
