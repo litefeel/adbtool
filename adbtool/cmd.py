@@ -38,6 +38,8 @@ def getAdb() -> str:
     if androidHome is None:
         androidHome = os.getenv("ANDROID_SDK")
     if androidHome is None:
+        androidHome = os.getenv("ANDROID_SDK_ROOT")
+    if androidHome is None:
         # print('can not found ANDROID_HOME/ANDROID_SDK in environment value')
         return "adb"
 
@@ -48,6 +50,8 @@ def getAapt() -> str:
     androidHome = os.getenv("ANDROID_HOME")
     if androidHome is None:
         androidHome = os.getenv("ANDROID_SDK")
+    if androidHome is None:
+        androidHome = os.getenv("ANDROID_SDK_ROOT")
     if androidHome is None:
         print("can not found ANDROID_HOME/ANDROID_SDK in environment value")
         return "aapt"
