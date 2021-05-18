@@ -15,7 +15,7 @@ def firstitem(arr):
 
 def parse(apk):
     aapt = getAapt()
-    cmd = "%s dump badging %s" % (aapt, apk)
+    cmd = '"%s" dump badging "%s"' % (aapt, apk)
     output, isOk = call(cmd)
     if isOk:
         packagename = firstitem(re.findall(r"package: name='(\S+?)'", output))
