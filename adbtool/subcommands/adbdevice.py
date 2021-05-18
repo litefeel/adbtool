@@ -42,7 +42,7 @@ def get_devices() -> list[Device]:
     return devices
 
 
-def getDevicesBySerial(devices, serial):
+def getDevicesBySerial(devices:list[Device], serial):
     serial = serial.lower()
     return list(
         filter(lambda device: device.serial.lower().startswith(serial), devices)
