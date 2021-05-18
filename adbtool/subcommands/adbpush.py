@@ -50,7 +50,7 @@ def pull(file: str, prefixLocal: str, prefixRemote: str) -> bool:
         remote = prefixRemote + file[len(prefixLocal) :]
 
     _, isOk = call(
-        '%s -s %s pull "%s" "%s"' % (getAdb(), g_serial, remote, local), True
+        '"%s" -s %s pull "%s" "%s"' % (getAdb(), g_serial, remote, local), True
     )
     return isOk
 
@@ -72,7 +72,7 @@ def push(file: str, prefixLocal: str, prefixRemote: str, dontpush: bool) -> None
         if not dontpush:
             rellocal = os.path.relpath(local, ".")
             _, isOk = call(
-                '%s -s %s push "%s" "%s"' % (getAdb(), g_serial, rellocal, remote), True
+                '"%s" -s %s push "%s" "%s"' % (getAdb(), g_serial, rellocal, remote), True
             )
         if isOk:
             date_dict[relname] = nowhash

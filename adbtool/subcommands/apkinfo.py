@@ -30,7 +30,7 @@ def stop(apk, serials):
     packagename, _, _ = parse(apk)
     adb = getAdb()
     for serial in serials:
-        cmd = '%s -s %s shell am force-stop "%s"' % (adb, serial, packagename)
+        cmd = '"%s" -s %s shell am force-stop "%s"' % (adb, serial, packagename)
         call(cmd)
 
 
@@ -38,7 +38,7 @@ def run(apk, serials):
     packagename, activityname, _ = parse(apk)
     adb = getAdb()
     for serial in serials:
-        cmd = '%s -s %s shell am start -S "%s/%s"' % (
+        cmd = '"%s" -s %s shell am start -S "%s/%s"' % (
             adb,
             serial,
             packagename,

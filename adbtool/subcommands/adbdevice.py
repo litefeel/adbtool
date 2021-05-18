@@ -28,7 +28,7 @@ def listOneItem(arr, index):
 
 
 def get_devices() -> list[Device]:
-    output, isOk = call("%s devices -l" % getAdb())
+    output, isOk = call('"%s" devices -l' % getAdb())
     devices: list[Device] = []
     if isOk:
         output = output.replace("\r\n", "\n").strip()
