@@ -6,7 +6,14 @@ from typing import Any
 from litefeel.pycommon.io import read_file
 
 from .config import Config
-from .subcommands import adbdevice, adbpush, apkinfo, apkinstall, apkuninstall
+from .subcommands import (
+    adbdevice,
+    adbpush,
+    apkinfo,
+    apkinstall,
+    apkuninstall,
+    apksigner,
+)
 
 _VERSION_FILE_NAME = "version.txt"
 
@@ -51,6 +58,7 @@ def main(_args=None):
         Command("install", apkinstall, "install apk file"),
         Command("uninstall", apkuninstall, "uninstall apk file"),
         Command("apk", apkinfo, "show apk packageName/activityName"),
+        Command("sign", apksigner, "sign apk with android debug(only windows)"),
     ]
 
     subparser = parser.add_subparsers(title="sub commands", dest="subcommand")

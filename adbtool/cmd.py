@@ -69,3 +69,28 @@ def getAapt() -> str:
 
     raise_error("can not found aapt in ANDROID_HOME/ANDROID_SDK")
     return ""
+
+def getApksigner() -> str:
+    androidHome = os.getenv("ANDROID_HOME")
+    if androidHome is None:
+        androidHome = os.getenv("ANDROID_SDK")
+    if androidHome is None:
+        androidHome = os.getenv("ANDROID_SDK_ROOT")
+    if androidHome is None:
+        print("can not found ANDROID_HOME/ANDROID_SDK in environment value")
+        return "aapt"
+
+    # aaptname = "apksigner.bat" if sys.platform == "win32" else "apksigner.bat"
+    aaptname = "apksigner.bat"
+
+    buildtools = os.path.join(androidHome, "build-tools")
+    if os.path.isdir(buildtools):
+        vers = list(map(lambda v: Version(v), os.listdir(buildtools)))
+        vers.sort(reverse=True)
+        for ver in vers:
+            filename = os.path.join(buildtools, str(ver), aaptname)
+            if os.path.isfile(filename):
+                return filename
+
+    raise_error("can not found aapt in ANDROID_HOME/ANDROID_SDK")
+    return ""
