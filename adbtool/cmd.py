@@ -94,3 +94,22 @@ def getApksigner() -> str:
 
     raise_error("can not found aapt in ANDROID_HOME/ANDROID_SDK")
     return ""
+
+def get_unity_editor_dir(editor_dir):
+    def is_editor_dir(dir):
+        if os.path.isdir(dir):
+            if os.path.isfile(os.path.join(dir, 'Unity.exe')):
+                return True
+        return False
+    if is_editor_dir(editor_dir):
+        return editor_dir
+    editor_dir = os.getenv("UNITY_EDITOR_ROOT")
+    if editor_dir is not None and is_editor_dir(editor_dir):
+        return editor_dir
+    raise_error('can not found unity editor')
+
+def get_unity_binary2text(unity_editor_dir):
+    return os.path.join(get_unity_editor_dir(unity_editor_dir), 'Data/Tools/binary2text.exe')
+
+def get_unity_webextract(unity_editor_dir):
+    return os.path.join(get_unity_editor_dir(unity_editor_dir), 'Data/Tools/WebExtract.exe')
