@@ -13,6 +13,7 @@ from .subcommands import (
     apkinstall,
     apkuninstall,
     apksigner,
+    assetbundleinfo,
 )
 
 _VERSION_FILE_NAME = "version.txt"
@@ -31,7 +32,7 @@ class Command:
         self.help = help
 
 
-def addsubcommands(subparser: argparse._SubParsersAction, commands: list[Command]):
+def addsubcommands(subparser: argparse._SubParsersAction, commands: list[Command]) -> None:
     for cmd in commands:
         parser = subparser.add_parser(cmd.name, help=cmd.help)
         parser.set_defaults(docommand=cmd.command.docommand)
@@ -59,6 +60,7 @@ def main(_args=None):
         Command("uninstall", apkuninstall, "uninstall apk file"),
         Command("apk", apkinfo, "show apk packageName/activityName"),
         Command("sign", apksigner, "sign apk with android debug(only windows)"),
+        Command("ab", assetbundleinfo, "extract unity asset bundle information"),
     ]
 
     subparser = parser.add_subparsers(title="sub commands", dest="subcommand")
