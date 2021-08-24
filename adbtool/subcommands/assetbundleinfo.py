@@ -55,7 +55,6 @@ def do_folder(input_dir:str, output_dir:str, ext:str, unity_editor_dir:str) -> N
             rel_name = os.path.relpath(input_file, input_dir)
             output_file = os.path.join(output_dir, rel_name + INFO_EXT)
             do_file(input_file, output_file, unity_editor_dir)
-            break
 
 
 def docommand(args: argparse.Namespace, cfg: Config) -> None:
