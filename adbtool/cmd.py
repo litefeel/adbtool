@@ -97,6 +97,8 @@ def getApksigner() -> str:
 
 def get_unity_editor_dir(editor_dir):
     def is_editor_dir(dir):
+        if dir is None:
+            return False
         if os.path.isdir(dir):
             if os.path.isfile(os.path.join(dir, 'Unity.exe')):
                 return True
@@ -104,7 +106,7 @@ def get_unity_editor_dir(editor_dir):
     if is_editor_dir(editor_dir):
         return editor_dir
     editor_dir = os.getenv("UNITY_EDITOR_ROOT")
-    if editor_dir is not None and is_editor_dir(editor_dir):
+    if is_editor_dir(editor_dir):
         return editor_dir
     raise_error('can not found unity editor')
 
