@@ -5,6 +5,7 @@ from posixpath import abspath
 import re
 import tempfile
 import shutil
+from litefeel.pycommon.io import makedirs
 
 from ..cmd import call, get_unity_binary2text, get_unity_webextract
 from ..config import Config
@@ -42,9 +43,10 @@ def do_file(input_file, output_file, unity_editor_dir):
         assert outfile
         outfile = bine2text(outfile, unity_editor_dir)
         assert outfile
+        makedirs(output_file, True)
         shutil.copy(outfile, output_file)
 
-def do_folder(input_dir:str, output_dir:str, ext:str, unity_editor_dir):
+def do_folder(input_dir:str, output_dir:str, ext:str, unity_editor_dir:str) -> None:
     for root, dir, files in os.walk(input_dir):
         for f in files:
             if ext and not f.endswith(ext):
