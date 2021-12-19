@@ -20,18 +20,22 @@ usage: adbt [options]
 
 show android device list
 
-optional arguments:
+options:
   -h, --help            show this help message and exit
   -c CONFIG, --config CONFIG
                         global config
   --version             show program's version number and exit
 
 sub commands:
-  {devices,push,install,apk}
+  {devices,push,install,uninstall,apk,sign,ab,il2cpp}
     devices             show android device list
     push                push files to android device
     install             install apk file
+    uninstall           uninstall apk file
     apk                 show apk packageName/activityName
+    sign                sign apk with android debug(only windows)
+    ab                  extract unity asset bundle information
+    il2cpp              extract unity il2cpp information
 ~~~
 
 ---
