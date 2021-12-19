@@ -14,6 +14,7 @@ from .subcommands import (
     apkuninstall,
     apksigner,
     assetbundleinfo,
+    il2cpp,
 )
 
 _VERSION_FILE_NAME = "version.txt"
@@ -61,6 +62,7 @@ def main(_args=None):
         Command("apk", apkinfo, "show apk packageName/activityName"),
         Command("sign", apksigner, "sign apk with android debug(only windows)"),
         Command("ab", assetbundleinfo, "extract unity asset bundle information"),
+        Command("il2cpp", il2cpp, "extract unity il2cpp information"),
     ]
 
     subparser = parser.add_subparsers(title="sub commands", dest="subcommand")
