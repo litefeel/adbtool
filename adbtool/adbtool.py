@@ -15,6 +15,7 @@ from .subcommands import (
     apksigner,
     assetbundleinfo,
     il2cpp,
+    asshader
 )
 
 _VERSION_FILE_NAME = "version.txt"
@@ -63,6 +64,7 @@ def main(_args=None):
         Command("sign", apksigner, "sign apk with android debug(only windows)"),
         Command("ab", assetbundleinfo, "extract unity asset bundle information"),
         Command("il2cpp", il2cpp, "extract unity il2cpp information"),
+        Command("asshader", asshader, "simplify asset studio shader preview data"),
     ]
 
     subparser = parser.add_subparsers(title="sub commands", dest="subcommand")
