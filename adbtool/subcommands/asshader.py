@@ -1,12 +1,9 @@
 import argparse
-from enum import Enum, IntEnum
 import os
-from zipfile import ZipFile
+from enum import IntEnum
 
-from genericpath import isdir, isfile
-from litefeel.pycommon.io import makedirs, write_lines, read_lines
+from litefeel.pycommon.io import makedirs, read_lines, write_lines
 
-from ..cmd import call
 from ..config import Config
 from ..errors import raise_error
 
