@@ -1,6 +1,6 @@
 import argparse
 import os
-from enum import IntEnum
+from enum import IntEnum, auto
 
 from litefeel.pycommon.io import makedirs, read_lines, write_lines
 
@@ -10,7 +10,8 @@ from ..errors import raise_error
 
 class SimplifyType(IntEnum):
     Format = 1
-    RemoveContent = 2
+    RemoveContent = auto()
+    OnlyKeyWord = auto()
 
 
 def _lstrips(lines: list[str]) -> None:
@@ -69,20 +70,42 @@ def do_file(file: str, output_file: str, simply: SimplifyType) -> None:
 
     if simply == SimplifyType.RemoveContent:
         lines = _remove_shader_content(lines)
+    elif simply == SimplifyType.OnlyKeyWord:
+        lines = list(set([line for line in lines if "Keywords {" in line]))
+        lines.sort()
     _format(lines)
     write_lines(output_file, lines)
 
 
+def do_folder(input_dir: str, output_dir: str, simply: SimplifyType) -> None:
+    for root, dir, files in os.walk(input_dir):
+        for f in files:
+            if not f.endswith(".shader"):
+                continue
+            input_file = os.path.join(root, f)
+            rel_name = os.path.relpath(input_file, input_dir)
+            output_file = os.path.join(output_dir, rel_name)
+            do_file(input_file, output_file, simply)
+
+
 def docommand(args: argparse.Namespace, cfg: Config) -> None:
     output = args.output
-    input = args.shader
-    if os.path.isfile(input):
+    shaderpath = args.shaderpath
+
+    if os.path.isfile(shaderpath):
         if output is None:
-            output = input
-        makedirs(output, isfile=True)
-        do_file(input, output, SimplifyType(args.simplify))
+            output = shaderpath
+        elif os.path.isdir(output):
+            output = os.path.join(output, os.path.basename(shaderpath))
+        do_file(shaderpath, output, SimplifyType(args.simplify))
+    elif os.path.isdir(shaderpath):
+        if output is None:
+            output = shaderpath
+        elif os.path.isfile(output):
+            raise_error("output cannot be file when shaderpath is folder")
+        do_folder(shaderpath, output, SimplifyType(args.simplify))
     else:
-        raise_error(f"shader is not exits:{input}")
+        raise_error(f"shaderpath is not exits:{shaderpath}")
 
 
 def addcommand(parser: argparse.ArgumentParser) -> None:
@@ -90,10 +113,10 @@ def addcommand(parser: argparse.ArgumentParser) -> None:
         "-s",
         "--simplify",
         nargs="?",
-        choices=[SimplifyType.Format.value, SimplifyType.RemoveContent.value],
-        default=1,
+        choices=[SimplifyType.Format.value, SimplifyType.RemoveContent.value, SimplifyType.OnlyKeyWord.value],
+        default=SimplifyType.Format.value,
         type=int,
-        help="simplify file 1:format 2:remove shader content",
+        help=f"simplify file 1:format 2:remove shader content 3:only keyworkd keeps default:{SimplifyType.Format.value}",
     )
     parser.add_argument("-o", "--output", help="output file or folder")
-    parser.add_argument("shader", help="asset stuido shader preview file")
+    parser.add_argument("shaderpath", help="asset stuido shader preview file")
