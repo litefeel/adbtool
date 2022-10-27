@@ -3,9 +3,9 @@ import os
 import tempfile
 from typing import Optional
 
-from ..cmd import call, getApksigner
+from ..cmd import call, getApksigner, getZipalign
 from ..config import Config
-from . import adbdevice, apkinfo
+from . import adbdevice
 
 # BASE_DIR="F:/release"
 BASE_DIR = ""
@@ -50,7 +50,8 @@ def sign(apks: list[str]) -> None:
     if not apks:
         return
 
-    adb = getApksigner()
+    apksigner = getApksigner()
+    zipalign = getZipalign()
     last = len(apks) - 1
 
     defaultkeystor = os.path.expanduser("~/.android/debug.keystore")
@@ -64,11 +65,11 @@ def sign(apks: list[str]) -> None:
         zipaligned = os.path.join(tempdirname, "zipaligned.apk").replace('\\', '/')
         for i in range(0, len(apks)):
             apk = apks[i]
-            cmd = f'"{adb}" -f 4 "{apk}" "{zipaligned}"'
+            cmd = f'"{zipalign}"  4 "{apk}" "{zipaligned}"'
             _, isOk = call(cmd, True)
             if os.path.isfile(zipaligned):
                 print("zipalign success")
-                cmd = f'{adb}" sign --ks "{defaultkeystor}" --ks-pass pass:android --out {apk} "{zipaligned}"'
+                cmd = f'"{apksigner}" sign --ks "{defaultkeystor}" --ks-pass pass:android --out {apk} "{zipaligned}"'
                 _, isOk = call(cmd, True)
                 print(isOk)
 
