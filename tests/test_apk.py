@@ -114,6 +114,9 @@ def test_apkinfo(capsys):
     captured = capsys.readouterr()
     out:str = captured.out
     out = out.strip().replace('\r\n', '\n')
+    print("--------------------------1")
+    print(out)
+    print("--------------------------2")
     assert out == APK_INFO
     assert captured.err == ""
 
