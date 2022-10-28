@@ -6,7 +6,7 @@ from adbtool import adbtool
 # def test_default():
 #     _assert_success("apk")
 
-APK_INFO = """package: name='com.litefeel.adbtoolapk' versionCode='1' versionName='1.0' platformBuildVersionName='7.1.1'
+APK_INFO = """package: name='com.litefeel.adbtoolapk' versionCode='1' versionName='1.0'
 sdkVersion:'15'
 targetSdkVersion:'25'
 application-label:'adbtoolapk'
