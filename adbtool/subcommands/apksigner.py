@@ -46,7 +46,7 @@ def filterApks(fileorpath: str, filters) -> Optional[str]:
     return apk
 
 
-def sign(apks: list[str]) -> None:
+def sign(apks: list[str], key_args: str) -> None:
     if not apks:
         return
 
@@ -54,22 +54,15 @@ def sign(apks: list[str]) -> None:
     zipalign = getZipalign()
     last = len(apks) - 1
 
-    defaultkeystor = os.path.expanduser("~/.android/debug.keystore")
-    print(defaultkeystor)
-
-    
-    # defaultkeystor = r"C:\Users\Administrator\.android\debug.keystore"
-    storepass = "android"
-
     with tempfile.TemporaryDirectory() as tempdirname:
-        zipaligned = os.path.join(tempdirname, "zipaligned.apk").replace('\\', '/')
+        zipaligned = os.path.join(tempdirname, "zipaligned.apk").replace("\\", "/")
         for i in range(0, len(apks)):
             apk = apks[i]
             cmd = f'"{zipalign}"  4 "{apk}" "{zipaligned}"'
             _, isOk = call(cmd, True)
             if os.path.isfile(zipaligned):
                 print("zipalign success")
-                cmd = f'"{apksigner}" sign --ks "{defaultkeystor}" --ks-pass pass:android --out {apk} "{zipaligned}"'
+                cmd = f'"{apksigner}" sign {key_args} --out {apk} "{zipaligned}"'
                 _, isOk = call(cmd, True)
                 print(isOk)
 
@@ -78,14 +71,32 @@ def docommand(args: argparse.Namespace, cfg: Config) -> None:
     path = args.apkpath or cfg.install.apkpath or "."
     path = os.path.abspath(os.path.join(BASE_DIR, path))
 
+    ks = args.ks or cfg.sign.ks
+    ks_pass = args.ks_pass or cfg.sign.ks_pass
+    key_pass = args.key_pass or cfg.sign.key_pass
+    ks_key_alias = args.ks_key_alias or cfg.sign.ks_key_alias
+
+    if not ks or not ks_pass:
+        ks = os.path.expanduser("~/.android/debug.keystore")
+        ks_pass = "pass:android"
+
+    print(ks)
+    key_args = f'--ks "{ks}"  --ks-pass {ks_pass}'
+    if ks_key_alias and key_pass:
+        key_args = f"{key_args} --key-pass {key_pass} --ks-key-alias {ks_key_alias}"
+
     apks = filterApks(path, args.filter)
 
     if apks is not None:
-        sign([apks])
+        sign([apks], key_args)
 
 
 def addcommand(parser: argparse.ArgumentParser) -> None:
     parser.add_argument("-f", "--filter", nargs="*", help="filtered by file name")
+    parser.add_argument("--ks")
+    parser.add_argument("--ks-pass", dest="ks_pass")
+    parser.add_argument("--ks-key-alias", dest="ks_key_alias")
+    parser.add_argument("--key-pass", dest="key_pass")
     # parser.add_argument(
     #     "-r", "--run", action="store_true", help="run app after install"
     # )

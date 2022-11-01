@@ -42,7 +42,7 @@ def addsubcommands(subparser: argparse._SubParsersAction, commands: list[Command
 
 
 def add_global_params(parser: argparse.ArgumentParser) -> None:
-    parser.add_argument("-c", "--config", dest="config", help="global config")
+    parser.add_argument("-c", "--config", nargs='?', dest="config", help="global config")
     parser.add_argument(
         "--version", action="version", version=f"%(prog)s {get_version()}"
     )
@@ -76,8 +76,11 @@ def main(_args=None):
         exit(0)
 
     cfg = Config()
-    if args.config is not None:
-        cfg.load_config(args.config)
+    configpath = args.config
+    if not configpath:
+        configpath = os.path.expanduser("~/adbtool.yml")
+    if configpath and os.path.isfile(configpath):
+        cfg.load_config(configpath)
     args.docommand(args, cfg)
 
 
