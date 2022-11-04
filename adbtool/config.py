@@ -56,6 +56,20 @@ class PushConfig:
         copy_bool("dontpush", obj, self, False)
 
 
+class PullConfig:
+    def __init__(self):
+        self.stat = False
+        self.localdir = "."
+        self.remotedir = "/sdcard"
+        self.paths = []
+
+    def load(self, obj):
+        copy_value("localdir", obj, self, ".")
+        copy_value("remotedir", obj, self, "/sdcard")
+        copy_value("paths", obj, self, [])
+        copy_bool("stat", obj, self, False)
+
+
 class ApkConfig:
     def __init__(self):
         self.apkpath = None
@@ -110,12 +124,14 @@ class SignConfig:
 class Config:
     def __init__(self):
         self.push = PushConfig()
+        self.pull = PullConfig()
         self.apk = ApkConfig()
         self.install = InstallConfig()
         self.sign = SignConfig()
 
     def load(self, obj: Any) -> None:
         copy_subconfig("push", obj, self.push)
+        copy_subconfig("pull", obj, self.pull)
         copy_subconfig("apk", obj, self.apk)
         copy_subconfig("install", obj, self.install)
         copy_subconfig("sign", obj, self.sign)

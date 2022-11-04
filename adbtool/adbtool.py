@@ -9,6 +9,7 @@ from .config import Config
 from .subcommands import (
     adbdevice,
     adbpush,
+    adbpull,
     apkinfo,
     apkinstall,
     apkuninstall,
@@ -58,6 +59,7 @@ def main(_args=None):
     commands = [
         Command("devices", adbdevice, "show android device list"),
         Command("push", adbpush, "push files to android device"),
+        Command("pull", adbpull, "pull files to android device"),
         Command("install", apkinstall, "install apk file"),
         Command("uninstall", apkuninstall, "uninstall apk file"),
         Command("apk", apkinfo, "show apk packageName/activityName"),
