@@ -84,10 +84,8 @@ def main(_args=None):
 
     cfg = Config()
     configpath = args.config or args.default_config
-    print(configpath)
     if configpath:
         realpath = os.path.expanduser(configpath)
-        print(realpath)
         if not os.path.isfile(realpath):
             parser.error(f"can not fond config file: {configpath}")
 
