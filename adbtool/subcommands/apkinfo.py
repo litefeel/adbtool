@@ -53,12 +53,10 @@ def docommand(args: argparse.Namespace, cfg: Config) -> None:
 
     if cfg.apk.apkpath is None:
         raise_error("Missing parameter: apkpath")
-        return
 
     apkpath = os.path.abspath(cfg.apk.apkpath)
     if not os.path.isfile(apkpath):
         raise_error("apkpath is not file")
-        return
 
     if args.run:
         serials, _ = adbdevice.doArgumentParser(args)

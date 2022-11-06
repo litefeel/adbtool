@@ -68,7 +68,6 @@ def getAapt() -> str:
                 return filename
 
     raise_error("can not found aapt in ANDROID_HOME/ANDROID_SDK")
-    return ""
 
 def getZipalign() -> str:
     androidHome = os.getenv("ANDROID_HOME")
@@ -93,7 +92,6 @@ def getZipalign() -> str:
                 return filename
 
     raise_error("can not found aapt in ANDROID_HOME/ANDROID_SDK")
-    return ""
 
 def getApksigner() -> str:
     androidHome = os.getenv("ANDROID_HOME")
@@ -118,9 +116,8 @@ def getApksigner() -> str:
                 return filename
 
     raise_error("can not found aapt in ANDROID_HOME/ANDROID_SDK")
-    return ""
 
-def get_unity_editor_dir(editor_dir):
+def get_unity_editor_dir(editor_dir:str)->str:
     def is_editor_dir(dir):
         if dir is None:
             return False
@@ -130,10 +127,10 @@ def get_unity_editor_dir(editor_dir):
         return False
     if is_editor_dir(editor_dir):
         return editor_dir
-    editor_dir = os.getenv("UNITY_EDITOR_ROOT")
+    editor_dir = os.getenv("UNITY_EDITOR_ROOT") or ""
     if is_editor_dir(editor_dir):
         return editor_dir
-    raise_error('can not found unity editor')
+    raise_error('can not found unity editor') 
 
 def get_unity_binary2text(unity_editor_dir):
     return os.path.join(get_unity_editor_dir(unity_editor_dir), 'Data/Tools/binary2text.exe')

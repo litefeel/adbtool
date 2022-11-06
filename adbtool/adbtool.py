@@ -1,6 +1,5 @@
 import argparse
 import os
-from argparse import _SubParsersAction
 from typing import Any
 
 from litefeel.pycommon.io import read_file
@@ -8,15 +7,15 @@ from litefeel.pycommon.io import read_file
 from .config import Config
 from .subcommands import (
     adbdevice,
-    adbpush,
     adbpull,
+    adbpush,
     apkinfo,
     apkinstall,
-    apkuninstall,
     apksigner,
+    apkuninstall,
     assetbundleinfo,
+    asshader,
     il2cpp,
-    asshader
 )
 
 _VERSION_FILE_NAME = "version.txt"
@@ -43,10 +42,16 @@ def addsubcommands(subparser: argparse._SubParsersAction, commands: list[Command
 
 
 def add_global_params(parser: argparse.ArgumentParser) -> None:
-    parser.add_argument("-c", "--config", nargs='?', dest="config", help="global config")
-    parser.add_argument(
-        "--version", action="version", version=f"%(prog)s {get_version()}"
+    group = parser.add_mutually_exclusive_group()
+    group.add_argument("-c", "--config", dest="config", help="global config")
+    group.add_argument(
+        "-d",
+        "--default_config",
+        action="store_const",
+        const="~/adbtool.yml",
+        help="default global config: ~/adbtool.yml",
     )
+    parser.add_argument("--version", action="version", version=f"%(prog)s {get_version()}")
 
 
 def main(_args=None):
@@ -78,11 +83,16 @@ def main(_args=None):
         exit(0)
 
     cfg = Config()
-    configpath = args.config
-    if not configpath:
-        configpath = os.path.expanduser("~/adbtool.yml")
-    if configpath and os.path.isfile(configpath):
-        cfg.load_config(configpath)
+    configpath = args.config or args.default_config
+    print(configpath)
+    if configpath:
+        realpath = os.path.expanduser(configpath)
+        print(realpath)
+        if not os.path.isfile(realpath):
+            parser.error(f"can not fond config file: {configpath}")
+
+        cfg.load_config(realpath)
+
     args.docommand(args, cfg)
 
 
