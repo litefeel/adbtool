@@ -2,6 +2,7 @@ import os
 import shlex
 import subprocess
 import sys
+import asyncio
 
 from semantic_version import Version
 
@@ -31,6 +32,26 @@ def call(cmd: str, printOutput: bool = False) -> tuple[str, bool]:
     except IOError as ioerr:
         print(f"cmd = {cmd}, ioerr = {ioerr}", file=sys.stderr)
         return "", False
+
+
+async def call_async(cmd: str, printOutput: bool = False) -> tuple[str, bool]:
+    proc = await asyncio.create_subprocess_shell(
+        cmd,
+        stdout=asyncio.subprocess.PIPE,
+        stderr=asyncio.subprocess.PIPE,
+    )
+    stdout, stderr = await proc.communicate()
+    isOk = proc.returncode == 0
+
+    output = ""
+    if stdout:
+        output = stdout.decode("utf-8")
+    if printOutput:
+        if output:
+            print(output)
+        if stderr:
+            print(stderr.decode("utf-8"))
+    return output, isOk
 
 
 def getAdb() -> str:
@@ -69,6 +90,7 @@ def getAapt() -> str:
 
     raise_error("can not found aapt in ANDROID_HOME/ANDROID_SDK")
 
+
 def getZipalign() -> str:
     androidHome = os.getenv("ANDROID_HOME")
     if androidHome is None:
@@ -92,6 +114,7 @@ def getZipalign() -> str:
                 return filename
 
     raise_error("can not found aapt in ANDROID_HOME/ANDROID_SDK")
+
 
 def getApksigner() -> str:
     androidHome = os.getenv("ANDROID_HOME")
@@ -117,23 +140,27 @@ def getApksigner() -> str:
 
     raise_error("can not found aapt in ANDROID_HOME/ANDROID_SDK")
 
-def get_unity_editor_dir(editor_dir:str)->str:
+
+def get_unity_editor_dir(editor_dir: str) -> str:
     def is_editor_dir(dir):
         if dir is None:
             return False
         if os.path.isdir(dir):
-            if os.path.isfile(os.path.join(dir, 'Unity.exe')):
+            if os.path.isfile(os.path.join(dir, "Unity.exe")):
                 return True
         return False
+
     if is_editor_dir(editor_dir):
         return editor_dir
     editor_dir = os.getenv("UNITY_EDITOR_ROOT") or ""
     if is_editor_dir(editor_dir):
         return editor_dir
-    raise_error('can not found unity editor') 
+    raise_error("can not found unity editor")
+
 
 def get_unity_binary2text(unity_editor_dir):
-    return os.path.join(get_unity_editor_dir(unity_editor_dir), 'Data/Tools/binary2text.exe')
+    return os.path.join(get_unity_editor_dir(unity_editor_dir), "Data/Tools/binary2text.exe")
+
 
 def get_unity_webextract(unity_editor_dir):
-    return os.path.join(get_unity_editor_dir(unity_editor_dir), 'Data/Tools/WebExtract.exe')
+    return os.path.join(get_unity_editor_dir(unity_editor_dir), "Data/Tools/WebExtract.exe")
