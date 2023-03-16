@@ -164,3 +164,19 @@ def get_unity_binary2text(unity_editor_dir):
 
 def get_unity_webextract(unity_editor_dir):
     return os.path.join(get_unity_editor_dir(unity_editor_dir), "Data/Tools/WebExtract.exe")
+
+
+def get_malioc():
+    malioc = os.getenv("MALIOC")
+    if malioc is not None and os.path.isfile(malioc):
+        return malioc
+
+    ARM_DIR = r"C:/Program Files/Arm"
+    if not os.path.isdir(ARM_DIR):
+        raise_error(f"can not found {ARM_DIR}")
+
+    for folder in os.listdir(ARM_DIR):
+        fullname = os.path.join(ARM_DIR, folder, "mali_offline_compiler/malioc.exe")
+        if os.path.isfile(fullname):
+            return fullname
+    raise_error("can not found malioc.exe")
