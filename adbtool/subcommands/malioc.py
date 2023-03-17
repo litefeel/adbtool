@@ -89,11 +89,11 @@ def do_file(file: str, output_file: str) -> None:
             write_file(vertfile, info.vert)
             write_file(fragfile, info.frag)
             lst.append("----------------------vert-----------------------")
-            cmd = f'"{malioc}" "{vertfile}"'
+            cmd = f'"{malioc}" -d "{vertfile}"'
             output, ok = call(cmd)
             _append_output(output, lst)
             lst.append("----------------------frag----------------------")
-            cmd = f'"{malioc}" "{fragfile}"'
+            cmd = f'"{malioc}" -d "{fragfile}"'
             output, ok = call(cmd)
             _append_output(output, lst)
             lst.append("")
