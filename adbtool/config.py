@@ -69,6 +69,12 @@ class PullConfig:
         copy_value("paths", obj, self, [])
         copy_bool("stat", obj, self, False)
 
+class ProcfdConfig:
+    def __init__(self):
+        self.procname = ""
+
+    def load(self, obj):
+        copy_value("procname", obj, self, "")
 
 class ApkConfig:
     def __init__(self):
@@ -128,6 +134,7 @@ class Config:
         self.apk = ApkConfig()
         self.install = InstallConfig()
         self.sign = SignConfig()
+        self.procfd = ProcfdConfig()
 
     def load(self, obj: Any) -> None:
         copy_subconfig("push", obj, self.push)
@@ -135,6 +142,7 @@ class Config:
         copy_subconfig("apk", obj, self.apk)
         copy_subconfig("install", obj, self.install)
         copy_subconfig("sign", obj, self.sign)
+        copy_subconfig("procfd", obj, self.procfd)
 
     def load_config(self, filename: str) -> None:
         data = read_file(filename)

@@ -17,6 +17,7 @@ from .subcommands import (
     asshader,
     il2cpp,
     malioc,
+    procfd,
 )
 
 _VERSION_FILE_NAME = "version.txt"
@@ -74,6 +75,7 @@ def main(_args=None):
         Command("il2cpp", il2cpp, "extract unity il2cpp information"),
         Command("asshader", asshader, "simplify asset studio shader preview data"),
         Command("malioc", malioc, "mail offline compile"),
+        Command("procfd", procfd, "print proc all fd"),
     ]
 
     subparser = parser.add_subparsers(title="sub commands", dest="subcommand")
