@@ -102,5 +102,6 @@ def addcommand(parser: argparse.ArgumentParser) -> None:
         "-e", "--ext", nargs="?", const="", default=".unity3d", help="assetbundle extions name"
     )
     parser.add_argument("-u", "--unityeditordir", nargs="?", help="unity editor folder")
+    parser.add_argument("-k", "--keepress", nargs="?", help="keep resS file")
     parser.add_argument("abpath", help="assetbundle file or folder")
     adbdevice.addArgumentParser(parser)
