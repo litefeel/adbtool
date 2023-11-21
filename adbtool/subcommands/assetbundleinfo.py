@@ -5,7 +5,7 @@ from posixpath import abspath
 import re
 import tempfile
 import shutil
-from litefeel.pycommon.io import makedirs
+from litefeel.pycommon.io import makedirs, write_file, read_file
 import asyncio
 
 from ..cmd import call_async, get_unity_binary2text, get_unity_webextract
@@ -43,12 +43,12 @@ async def do_file(input: str, output: str, unity_editor_dir: str, sem: asyncio.S
         with tempfile.TemporaryDirectory() as tmpdirname:
             tmpunityfile = os.path.join(tmpdirname, "tmp.unity3d")
             shutil.copy(input, tmpunityfile)
-            outfile = await extract(tmpunityfile, unity_editor_dir)
-            assert outfile
-            outfile = await bine2text(outfile, unity_editor_dir)
+            resfile = await extract(tmpunityfile, unity_editor_dir)
+            assert resfile
+            outfile = await bine2text(resfile, unity_editor_dir)
             assert outfile
             makedirs(output, True)
-            shutil.copy(outfile, output)
+            write_file(output, os.path.basename(resfile) + "\n\n" + read_file(outfile))
 
 
 def _collect_files(
