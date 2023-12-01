@@ -48,9 +48,12 @@ async def do_file(input: str, output: str, unity_editor_dir: str, sem: asyncio.S
             outfile = await bine2text(resfile, unity_editor_dir)
             assert outfile
             makedirs(output, True)
-            write_file(output, os.path.basename(resfile) + "\n\n" + read_file(outfile))
-
-
+            shutil.copyfile(outfile, output)
+            with open(output, mode='wb') as f:
+                f.write(os.path.basename(resfile).encode('utf-8'))
+                f.write(b"\n\n")
+                f.write(read_file(outfile, True))
+                
 def _collect_files(
     input_dir: str, output_dir: str, ext: str, filelist: list[tuple[str, str]]
 ) -> None:
