@@ -1,4 +1,5 @@
 import os
+import platform
 import shlex
 import subprocess
 import sys
@@ -146,7 +147,10 @@ def get_unity_editor_dir(editor_dir: str) -> str:
         if dir is None:
             return False
         if os.path.isdir(dir):
-            if os.path.isfile(os.path.join(dir, "Unity.exe")):
+            current_platform = platform.system()
+            if current_platform == "Windows" and os.path.isfile(f"{dir}/Unity.exe"):
+                return True
+            if current_platform == "Darwin" and os.path.basename(dir) == "Unity.app":
                 return True
         return False
 
@@ -159,12 +163,23 @@ def get_unity_editor_dir(editor_dir: str) -> str:
 
 
 def get_unity_binary2text(unity_editor_dir):
-    return os.path.join(get_unity_editor_dir(unity_editor_dir), "Data/Tools/binary2text.exe")
+    current_platform = platform.system()
+    if current_platform == "Windows":
+        return os.path.join(get_unity_editor_dir(unity_editor_dir), "Data/Tools/binary2text")
+    if current_platform == "Darwin":
+        return os.path.join(get_unity_editor_dir(unity_editor_dir), "Contents/Tools/binary2text")
+    
+    raise_error("unsupport platform")
 
 
 def get_unity_webextract(unity_editor_dir):
-    return os.path.join(get_unity_editor_dir(unity_editor_dir), "Data/Tools/WebExtract.exe")
-
+    current_platform = platform.system()
+    if current_platform == "Windows":
+        return os.path.join(get_unity_editor_dir(unity_editor_dir), "Data/Tools/WebExtract")
+    if current_platform == "Darwin":
+        return os.path.join(get_unity_editor_dir(unity_editor_dir), "Contents/Tools/WebExtract")
+    
+    raise_error("unsupport platform")
 
 def get_malioc():
     malioc = os.getenv("MALIOC")
