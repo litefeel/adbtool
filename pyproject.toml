@@ -1,2 +1,39 @@
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[project]
+name = "adbtool"
+version = "0.0.24"
+dependencies = [
+  "litefeel-pycommon>=0.4.15",
+  "PyYAML",
+  "semantic_version",
+  "var_dump"
+]
+requires-python = ">=3.10"
+authors = [
+  {name = "litefeel", email = "litefeel@gmail.com"},
+]
+description = "A friendly android adb command-line tool"
+readme = "README.md"
+license = {file = "LICENSE"}
+keywords = ["Android", "adb"]
+classifiers = [
+  "Development Status :: 4 - Beta",
+  "Topic :: Software Development :: Libraries :: Python Modules",
+  "Programming Language :: Python"
+]
+
+[project.urls]
+Homepage = "http://github.com/litefeel/pycommon"
+Repository = "http://github.com/litefeel/pycommon.git"
+"Bug Tracker" = "http://github.com/litefeel/pycommon/issues"
+
+[project.scripts]
+adbt = "adbtool.adbtool:main"
+
+
+
 [tool.black]
 line-length = 100

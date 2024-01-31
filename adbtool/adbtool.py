@@ -1,32 +1,18 @@
 import argparse
+import importlib.metadata
 import os
 from typing import Any
 
 from litefeel.pycommon.io import read_file
 
 from .config import Config
-from .subcommands import (
-    adbdevice,
-    adbpull,
-    adbpush,
-    apkinfo,
-    apkinstall,
-    apksigner,
-    apkuninstall,
-    assetbundleinfo,
-    asshader,
-    il2cpp,
-    malioc,
-    procfd,
-)
-
-_VERSION_FILE_NAME = "version.txt"
+from .subcommands import (adbdevice, adbpull, adbpush, apkinfo, apkinstall,
+                          apksigner, apkuninstall, assetbundleinfo, asshader,
+                          il2cpp, malioc, procfd)
 
 
 def get_version() -> str:
-    dir_of_this_script = os.path.split(__file__)[0]
-    version_file_path = os.path.join(dir_of_this_script, _VERSION_FILE_NAME)
-    return read_file(version_file_path).strip()
+    return importlib.metadata.version('adbtool')
 
 
 class Command:
