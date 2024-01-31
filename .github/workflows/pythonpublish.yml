@@ -7,18 +7,26 @@ on:
   release:
     types: [created]
 
-# .github/workflows/ci-cd.yml
 jobs:
-  pypi-publish:
-    name: Upload release to PyPI
+  deploy:
+
     runs-on: ubuntu-latest
     environment:
       name: pypi
       url: https://pypi.org/p/adbtool
     permissions:
       id-token: write  # IMPORTANT: this permission is mandatory for trusted publishing
-    steps:
-    # retrieve your distributions here
 
+    steps:
+    - uses: actions/checkout@v4
+    - name: Set up Python
+      uses: actions/setup-python@v1
+      with:
+        python-version: '3.x'
+    - name: Install dependencies and build
+      run: |
+        python -m pip install --upgrade pip
+        pip install build twine
+        python -m build
     - name: Publish package distributions to PyPI
       uses: pypa/gh-action-pypi-publish@release/v1
