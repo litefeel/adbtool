@@ -126,6 +126,14 @@ class SignConfig:
         copy_value("ks-key-alias", obj, self._dct, None)
         copy_value("key-pass", obj, self._dct, None)
 
+class AssetBundleConfig:
+    def __init__(self):
+        self.unityeditordir = None
+        self.keepress = None
+
+    def load(self, obj):
+        copy_value("unityeditordir", obj, self, None)
+        copy_bool("keepress", obj, self, None)
 
 class Config:
     def __init__(self):
@@ -135,6 +143,7 @@ class Config:
         self.install = InstallConfig()
         self.sign = SignConfig()
         self.procfd = ProcfdConfig()
+        self.assetbundle = AssetBundleConfig()
 
     def load(self, obj: Any) -> None:
         copy_subconfig("push", obj, self.push)
@@ -143,6 +152,7 @@ class Config:
         copy_subconfig("install", obj, self.install)
         copy_subconfig("sign", obj, self.sign)
         copy_subconfig("procfd", obj, self.procfd)
+        copy_subconfig("ab", obj, self.assetbundle)
 
     def load_config(self, filename: str) -> None:
         data = read_file(filename)

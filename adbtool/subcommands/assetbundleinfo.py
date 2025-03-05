@@ -79,7 +79,7 @@ async def do_files(filelist: list[tuple[str, str]], unity_editor_dir: str) -> No
 def docommand(args: argparse.Namespace, cfg: Config) -> None:
     output = args.output
     abpath = args.abpath
-    unity_editor_dir = args.unityeditordir
+    unity_editor_dir = args.unityeditordir or cfg.assetbundle.unityeditordir
     files: list[tuple[str, str]] = []
     if os.path.isfile(abpath):
         if output is None:
