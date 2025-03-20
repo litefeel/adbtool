@@ -44,16 +44,14 @@ def _collect_files(input_dir: str, filelist: list[str]) -> None:
 
 
 def docommand(args: argparse.Namespace, cfg: Config) -> None:
-    output = args.output
-    abpath = args.abpath
-    unity_editor_dir = args.unityeditordir or cfg.assetbundle.unityeditordir
+    ospath = args.path
     files: list[str] = []
-    if os.path.isfile(abpath):
-        files.append(abpath)
-    elif os.path.isdir(abpath):
-        _collect_files(abpath, files)
+    if os.path.isfile(ospath):
+        files.append(ospath)
+    elif os.path.isdir(ospath):
+        _collect_files(ospath, files)
     else:
-        raise_error(f"abpath is not exits:{abpath}")
+        raise_error(f"abpath is not exits:{ospath}")
 
     for file in files:
         do_file(file)
