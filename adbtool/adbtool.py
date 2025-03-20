@@ -3,16 +3,14 @@ import importlib.metadata
 import os
 from typing import Any
 
-from litefeel.pycommon.io import read_file
-
 from .config import Config
 from .subcommands import (adbdevice, adbpull, adbpush, apkinfo, apkinstall,
                           apksigner, apkuninstall, assetbundleinfo, asshader,
-                          il2cpp, malioc, procfd)
+                          il2cpp, malioc, pagesize, procfd)
 
 
 def get_version() -> str:
-    return importlib.metadata.version('adbtool')
+    return importlib.metadata.version("adbtool")
 
 
 class Command:
@@ -39,6 +37,11 @@ def add_global_params(parser: argparse.ArgumentParser) -> None:
         const="~/adbtool.yml",
         help="default global config: ~/adbtool.yml",
     )
+    group.add_argument(
+        "-g",
+        "--group",
+        help="select group from config, default global config: ~/adbtool.yml",
+    )
     parser.add_argument("--version", action="version", version=f"%(prog)s {get_version()}")
 
 
@@ -62,6 +65,7 @@ def main(_args=None):
         Command("asshader", asshader, "simplify asset studio shader preview data"),
         Command("malioc", malioc, "mail offline compile"),
         Command("procfd", procfd, "print proc all fd"),
+        Command("pagesize", pagesize, "print page size for so file"),
     ]
 
     subparser = parser.add_subparsers(title="sub commands", dest="subcommand")

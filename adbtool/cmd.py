@@ -141,6 +141,29 @@ def getApksigner() -> str:
 
     raise_error("can not found aapt in ANDROID_HOME/ANDROID_SDK")
 
+def get_objdump() -> str:
+    androidHome = os.getenv("ANDROID_HOME")
+    if androidHome is None:
+        androidHome = os.getenv("ANDROID_SDK")
+    if androidHome is None:
+        androidHome = os.getenv("ANDROID_SDK_ROOT")
+    if androidHome is None:
+        print("can not found ANDROID_HOME/ANDROID_SDK in environment value")
+        return "objdump"
+
+    exename = "toolchains/llvm/prebuilt/windows-x86_64/bin/llvm-objdump.exe"
+    # C:\Users\Admin\AppData\Local\Android\Sdk\ndk\23.1.7779620\toolchains\llvm\prebuilt\windows-x86_64\bin\llvm-objdump.exe
+    buildtools = os.path.join(androidHome, "ndk")
+    if os.path.isdir(buildtools):
+        vers = list(map(lambda v: Version(v), os.listdir(buildtools)))
+        vers.sort(reverse=True)
+        for ver in vers:
+            filename = os.path.join(buildtools, str(ver), exename)
+            if os.path.isfile(filename):
+                return filename
+
+
+    raise_error("can not found aapt in ANDROID_HOME/ANDROID_SDK")
 
 def get_unity_editor_dir(editor_dir: str) -> str:
     def is_editor_dir(dir):
