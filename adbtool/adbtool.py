@@ -37,7 +37,7 @@ def add_global_params(parser: argparse.ArgumentParser) -> None:
         const="~/adbtool.yml",
         help="default global config: ~/adbtool.yml",
     )
-    group.add_argument(
+    parser.add_argument(
         "-g",
         "--group",
         help="select group from config, default global config: ~/adbtool.yml",
@@ -46,10 +46,7 @@ def add_global_params(parser: argparse.ArgumentParser) -> None:
 
 
 def main(_args=None):
-    parser = argparse.ArgumentParser(
-        usage="%(prog)s [options]", description="show android device list"
-    )
-
+    parser = argparse.ArgumentParser()
     add_global_params(parser)
 
     commands = [
@@ -78,12 +75,19 @@ def main(_args=None):
 
     cfg = Config()
     configpath = args.config or args.default_config
+    if not configpath and args.group:
+        configpath = os.path.expanduser("~/adbtool.yml")
     if configpath:
         realpath = os.path.expanduser(configpath)
         if not os.path.isfile(realpath):
             parser.error(f"can not fond config file: {configpath}")
 
         cfg.load_config(realpath)
+
+    if args.group:
+        cfg = cfg.groups.get(args.group, None)
+        if cfg is None:
+            parser.error(f"can not fond group: {args.group}")
 
     args.docommand(args, cfg)
 

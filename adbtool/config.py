@@ -145,6 +145,8 @@ class Config:
         self.procfd = ProcfdConfig()
         self.assetbundle = AssetBundleConfig()
 
+        self.groups = {}
+
     def load(self, obj: Any) -> None:
         copy_subconfig("push", obj, self.push)
         copy_subconfig("pull", obj, self.pull)
@@ -159,3 +161,13 @@ class Config:
         obj = yaml.load(data, Loader=yaml.BaseLoader)
         # var_dump(obj)
         self.load(obj)
+        self.parse_groups(obj)
+
+    def parse_groups(self, obj: Any) -> None:
+        if groups := obj.get("groups", None):
+            for key, value in groups.items():
+                group = Config()
+                group.load(value)
+                self.groups[key] = group
+        else:
+            self.groups = {}
