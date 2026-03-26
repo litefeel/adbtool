@@ -31,7 +31,7 @@ def file_sha1(file: str) -> str:
 
 
 def file_mtime(file: str) -> str:
-    return str(os.path.getmtime(push_cfg.localdir))
+    return str(os.path.getmtime(file))
 
 
 def load_json(filename: str) -> dict:
@@ -129,7 +129,8 @@ def push_all(cfg: PushConfig, serial: str, hashjson: str) -> None:
 
     if len(errors) > 0:
         print("error paths:")
-        map(print, errors)
+        for e in errors:
+            print(e)
 
 
 def _is_relpath(path, root):

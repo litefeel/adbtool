@@ -85,7 +85,7 @@ def do_file(file: str, output_file: str) -> None:
         for info in infos:
             lst.append("=================================================")
             lst.append("Global Keywords:" + info.global_keywords)
-            lst.append("Local Keywords:" + info.global_keywords)
+            lst.append("Local Keywords:" + info.local_keywords)
             write_file(vertfile, info.vert)
             write_file(fragfile, info.frag)
             lst.append("----------------------vert-----------------------")
