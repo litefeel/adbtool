@@ -19,7 +19,7 @@ from . import adbdevice
 
 def do_file(file: str) -> None:
     if not os.path.isfile(file):
-        raise_error(f"file not fond:{file}")
+        raise_error(f"file not find:{file}")
 
     # 从配置中获取apksigner路径
     objdump = get_objdump()
@@ -51,7 +51,7 @@ def docommand(args: argparse.Namespace, cfg: Config) -> None:
     elif os.path.isdir(ospath):
         _collect_files(ospath, files)
     else:
-        raise_error(f"abpath is not exits:{ospath}")
+        raise_error(f"path does not exist:{ospath}")
 
     for file in files:
         do_file(file)

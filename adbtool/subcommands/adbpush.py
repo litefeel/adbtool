@@ -226,7 +226,7 @@ def addcommand(parser: argparse.ArgumentParser) -> None:
         "--dontpush",
         dest="dontpush",
         action="store_true",
-        help="only outout json file, not really push file to remote",
+        help="only output json file, not really push file to remote",
     )
     parser.add_argument("path", nargs="*", help="file or directory")
     adbdevice.addArgumentParser(parser)

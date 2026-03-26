@@ -82,7 +82,7 @@ def main(_args=None):
         Command("ab", assetbundleinfo, "extract unity asset bundle information"),
         Command("il2cpp", il2cpp, "extract unity il2cpp information"),
         Command("asshader", asshader, "simplify asset studio shader preview data"),
-        Command("malioc", malioc, "mail offline compile"),
+        Command("malioc", malioc, "mali offline compile"),
         Command("procfd", procfd, "print proc all fd"),
         Command("pagesize", pagesize, "print page size for so file"),
     ]
@@ -104,14 +104,14 @@ def main(_args=None):
     if configpath:
         realpath = os.path.expanduser(configpath)
         if not os.path.isfile(realpath):
-            parser.error(f"can not fond config file: {configpath}")
+            parser.error(f"can not find config file: {configpath}")
 
         cfg.load_config(realpath)
 
     if args.group:
         cfg = cfg.groups.get(args.group, None)
         if cfg is None:
-            parser.error(f"can not fond group: {args.group}")
+            parser.error(f"can not find group: {args.group}")
 
     if args.subcommand == "adb":
         raw_args = sys.argv[1:] if _args is None else list(_args)

@@ -72,6 +72,6 @@ def docommand(args: argparse.Namespace, cfg: Config) -> None:
 def addcommand(parser: argparse.ArgumentParser) -> None:
     group = parser.add_mutually_exclusive_group()
     group.add_argument("-r", "--run", action="store_true", help="run app")
-    group.add_argument("-s", "--stop", action="store_true", help="run app")
+    group.add_argument("-s", "--stop", action="store_true", help="stop app")
     parser.add_argument("apkpath", nargs="?")
     adbdevice.addArgumentParser(parser)

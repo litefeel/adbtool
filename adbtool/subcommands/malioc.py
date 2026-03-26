@@ -129,11 +129,11 @@ def docommand(args: argparse.Namespace, cfg: Config) -> None:
     #         raise_error("output cannot be file when shaderpath is folder")
     #     do_folder(shaderpath, output, SimplifyType(args.simplify))
     else:
-        raise_error(f"shaderpath is not exits:{shaderpath}")
+        raise_error(f"shaderpath does not exist:{shaderpath}")
 
 
 def addcommand(parser: argparse.ArgumentParser) -> None:
-    parser.add_argument("shaderpath", help="asset stuido shader preview file")
+    parser.add_argument("shaderpath", help="asset studio shader preview file")
     parser.add_argument("output", nargs="?", help="output file or folder")
 
 

@@ -18,7 +18,7 @@ def extract(file, output_folder):
 
 def do_file(apkfile, output_folder):
     if not os.path.isfile(apkfile):
-        raise_error(f'file not fond:{apkfile}')
+        raise_error(f'file not find:{apkfile}')
 
     extract(apkfile, output_folder)
     il2cppso = os.path.join(output_folder, "libil2cpp.so")
@@ -35,7 +35,7 @@ def docommand(args: argparse.Namespace, cfg: Config) -> None:
         makedirs(output)
         do_file(apkpath, output)
     else:
-        raise_error(f"apkpath is not exits:{apkpath}")
+        raise_error(f"apkpath does not exist:{apkpath}")
 
 
 def addcommand(parser: argparse.ArgumentParser) -> None:
