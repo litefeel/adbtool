@@ -14,7 +14,7 @@ def firstitem(arr):
 
 def parse(apk):
     aapt = getAapt()
-    cmd = '"%s" dump badging "%s"' % (aapt, apk)
+    cmd = f'"{aapt}" dump badging "{apk}"'
     output, isOk = call(cmd)
     if isOk:
         packagename = firstitem(re.findall(r"package: name='(\S+?)'", output))
@@ -29,7 +29,7 @@ def stop(apk, serials):
     packagename, _, _ = parse(apk)
     adb = getAdb()
     for serial in serials:
-        cmd = '"%s" -s %s shell am force-stop "%s"' % (adb, serial, packagename)
+        cmd = f'"{adb}" -s {serial} shell am force-stop "{packagename}"'
         call(cmd)
 
 
@@ -37,12 +37,7 @@ def run(apk, serials):
     packagename, activityname, _ = parse(apk)
     adb = getAdb()
     for serial in serials:
-        cmd = '"%s" -s %s shell am start -S "%s/%s"' % (
-            adb,
-            serial,
-            packagename,
-            activityname,
-        )
+        cmd = f'"{adb}" -s {serial} shell am start -S "{packagename}/{activityname}"'
         call(cmd)
 
 

@@ -48,7 +48,7 @@ def install(apks: list[str], serials: list[str], run: bool) -> None:
     for i, apk in enumerate(apks):
         isrun = run and last == i
         for serial in serials:
-            cmd = '"%s" -s %s install -r "%s"' % (adb, serial, apk)
+            cmd = f'"{adb}" -s {serial} install -r "{apk}"'
             _, isOk = call(cmd, True)
             print(isOk)
             if isOk and isrun:

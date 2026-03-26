@@ -83,7 +83,7 @@ def printDevices(devices: list[Device]):
     if devices is None:
         return
     for i, device in enumerate(devices, start=1):
-        print("%-3d %s" % (i, device.raw))
+        print(f"{i:<3} {device.raw}")
 
 
 ##### for other script

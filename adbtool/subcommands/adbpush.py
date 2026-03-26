@@ -50,7 +50,7 @@ def pull(file: str, prefixLocal: str, prefixRemote: str) -> bool:
         remote = prefixRemote + file[len(prefixLocal) :]
 
     _, isOk = call(
-        '"%s" -s %s pull "%s" "%s"' % (getAdb(), g_serial, remote, local), True
+        f'"{getAdb()}" -s {g_serial} pull "{remote}" "{local}"', True
     )
     return isOk
 
@@ -72,7 +72,7 @@ def push(file: str, prefixLocal: str, prefixRemote: str, dontpush: bool) -> None
         if not dontpush:
             rellocal = os.path.relpath(local, ".")
             _, isOk = call(
-                '"%s" -s %s push "%s" "%s"' % (getAdb(), g_serial, rellocal, remote), True
+                f'"{getAdb()}" -s {g_serial} push "{rellocal}" "{remote}"', True
             )
         if isOk:
             date_dict[relname] = nowhash
@@ -83,7 +83,7 @@ def push(file: str, prefixLocal: str, prefixRemote: str, dontpush: bool) -> None
 def filePush(path, prefixLocal, prefixRemote, dontpush):
     files = os.listdir(path)
     for f in files:
-        file = "%s/%s" % (path, f)
+        file = f"{path}/{f}"
         if os.path.isfile(file):
             push(file, prefixLocal, prefixRemote, dontpush)
 
@@ -91,7 +91,7 @@ def filePush(path, prefixLocal, prefixRemote, dontpush):
 def walkPush(path, prefixLocal, prefixRemote, dontpush):
     for root, _, files in os.walk(path):
         for f in files:
-            push("%s/%s" % (root, f), prefixLocal, prefixRemote, dontpush)
+            push(f"{root}/{f}", prefixLocal, prefixRemote, dontpush)
 
 
 def push_all(cfg: PushConfig, serial: str, hashjson: str) -> None:
@@ -181,7 +181,7 @@ def docommand(args: argparse.Namespace, cfg: Config) -> None:
     hashfunc = file_mtime if args.hash == "mtime" else file_sha1
 
     for device in devices:
-        hashjson = "%s_%s.json" % (device.model, device.serial)
+        hashjson = f"{device.model}_{device.serial}.json"
         hashjson = os.path.abspath(hashjson)
         push_all(push_cfg, device.serial, hashjson)
 
