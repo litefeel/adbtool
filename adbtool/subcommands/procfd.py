@@ -2,6 +2,8 @@ import argparse
 from enum import IntEnum, auto
 import os
 
+from adbtool.errors import raise_error
+
 from ..cmd import call, getAdb
 from ..config import Config, ProcfdConfig
 from . import adbdevice
