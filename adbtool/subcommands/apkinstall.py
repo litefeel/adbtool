@@ -45,8 +45,7 @@ def filterApks(fileorpath: str, filters) -> str | None:
 def install(apks: list[str], serials: list[str], run: bool) -> None:
     adb = getAdb()
     last = len(apks) - 1
-    for i in range(0, len(apks)):
-        apk = apks[i]
+    for i, apk in enumerate(apks):
         isrun = run and last == i
         for serial in serials:
             cmd = '"%s" -s %s install -r "%s"' % (adb, serial, apk)

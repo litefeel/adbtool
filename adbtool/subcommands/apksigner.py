@@ -49,12 +49,10 @@ def sign(apks: list[str], key_args: str) -> None:
 
     apksigner = getApksigner()
     zipalign = getZipalign()
-    last = len(apks) - 1
 
     with tempfile.TemporaryDirectory() as tempdirname:
         zipaligned = os.path.join(tempdirname, "zipaligned.apk").replace("\\", "/")
-        for i in range(0, len(apks)):
-            apk = apks[i]
+        for apk in apks:
             cmd = f'"{zipalign}"  4 "{apk}" "{zipaligned}"'
             _, isOk = call(cmd, True)
             if os.path.isfile(zipaligned):

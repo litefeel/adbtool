@@ -44,9 +44,7 @@ def filterApks(fileorpath: str, filters) -> str | None:
 
 def uninstall(apks: list[str], serials: list[str]) -> None:
     adb = getAdb()
-    last = len(apks) - 1
-    for i in range(0, len(apks)):
-        apk = apks[i]
+    for apk in apks:
         package, _, _ = apkinfo.parse(apk)
         for serial in serials:
             cmd = '"%s" -s %s uninstall "%s"' % (adb, serial, package)

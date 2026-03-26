@@ -15,14 +15,13 @@ class SimplifyType(IntEnum):
 
 
 def _lstrips(lines: list[str]) -> None:
-    for i in range(len(lines)):
-        lines[i] = lines[i].lstrip()
+    for i, line in enumerate(lines):
+        lines[i] = line.lstrip()
 
 
 def _format(lines: list[str]) -> None:
     space = ""
-    for i in range(len(lines)):
-        line = lines[i]
+    for i, line in enumerate(lines):
 
         prev_space = space
         n = 0

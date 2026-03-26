@@ -82,16 +82,13 @@ def filterDevices(devices: list[Device], args) -> list[Device]:
 def printDevices(devices: list[Device]):
     if devices is None:
         return
-    for i in range(len(devices)):
-        print("%-3d %s" % (i + 1, devices[i].raw))
+    for i, device in enumerate(devices, start=1):
+        print("%-3d %s" % (i, device.raw))
 
 
 ##### for other script
 def getSerials(devices: list[Device]) -> list[str]:
-    serials = []
-    for d in devices:
-        serials.append(d.serial)
-    return serials
+    return [device.serial for device in devices]
 
 
 def addArgumentParser(parser):
