@@ -27,7 +27,8 @@ options:
   --version             show program's version number and exit
 
 sub commands:
-  {devices,push,install,uninstall,apk,sign,ab,il2cpp}
+  {adb,devices,push,install,uninstall,apk,sign,ab,il2cpp}
+    adb                 forward raw adb arguments
     devices             show android device list
     push                push files to android device
     install             install apk file
@@ -37,6 +38,17 @@ sub commands:
     ab                  extract unity asset bundle information
     il2cpp              extract unity il2cpp information
 ~~~
+
+---
+
+~~~
+adbt adb devices
+adbt adb -d shell
+adbt adb -H localhost devices
+~~~
+
+`adbt adb ...` is a raw passthrough to the real `adb` binary, so adb options such as
+`-d`, `-s`, `-H`, `--help`, and `--version` keep their native meaning.
 
 ---
 

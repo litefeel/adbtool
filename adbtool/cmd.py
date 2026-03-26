@@ -4,6 +4,7 @@ import shlex
 import subprocess
 import sys
 import asyncio
+from typing import Sequence
 
 from semantic_version import Version
 
@@ -33,6 +34,23 @@ def call(cmd: str, printOutput: bool = False) -> tuple[str, bool]:
     except IOError as ioerr:
         print(f"cmd = {cmd}, ioerr = {ioerr}", file=sys.stderr)
         return "", False
+
+
+def call_argv(args: Sequence[str], printOutput: bool = False) -> tuple[str, int]:
+    try:
+        if printOutput:
+            return "", subprocess.call(list(args))
+
+        data = subprocess.check_output(list(args))
+        output = data.decode("utf-8")
+        return output, 0
+    except subprocess.CalledProcessError as callerr:
+        print(f"args = {list(args)}, callerr.output = {callerr.output}", file=sys.stderr)
+        output = callerr.output.decode("utf-8") if callerr.output else ""
+        return output, callerr.returncode
+    except OSError as ioerr:
+        print(f"args = {list(args)}, ioerr = {ioerr}", file=sys.stderr)
+        return "", 1
 
 
 async def call_async(cmd: str, printOutput: bool = False) -> tuple[str, bool]:

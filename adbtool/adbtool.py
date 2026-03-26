@@ -1,10 +1,11 @@
 import argparse
 import importlib.metadata
 import os
+import sys
 from typing import Any
 
 from .config import Config
-from .subcommands import (adbdevice, adbpull, adbpush, apkinfo, apkinstall,
+from .subcommands import (adb, adbdevice, adbpull, adbpush, apkinfo, apkinstall,
                           apksigner, apkuninstall, assetbundleinfo, asshader,
                           il2cpp, malioc, pagesize, procfd)
 
@@ -14,15 +15,16 @@ def get_version() -> str:
 
 
 class Command:
-    def __init__(self, name: str, command: Any, help: str):
+    def __init__(self, name: str, command: Any, help: str, add_help: bool = True):
         self.name = name
         self.command = command
         self.help = help
+        self.add_help = add_help
 
 
 def addsubcommands(subparser: argparse._SubParsersAction, commands: list[Command]) -> None:
     for cmd in commands:
-        parser = subparser.add_parser(cmd.name, help=cmd.help)
+        parser = subparser.add_parser(cmd.name, help=cmd.help, add_help=cmd.add_help)
         parser.set_defaults(docommand=cmd.command.docommand)
         cmd.command.addcommand(parser)
 
@@ -45,11 +47,31 @@ def add_global_params(parser: argparse.ArgumentParser) -> None:
     parser.add_argument("--version", action="version", version=f"%(prog)s {get_version()}")
 
 
+def _find_adb_subcommand_index(argv: list[str]) -> int | None:
+    i = 0
+    while i < len(argv):
+        arg = argv[i]
+        if arg == "adb":
+            return i
+        if arg in ("-c", "--config", "-g", "--group"):
+            i += 2
+            continue
+        if arg.startswith("--config=") or arg.startswith("--group="):
+            i += 1
+            continue
+        if arg in ("-d", "--default_config", "-h", "--help", "--version"):
+            i += 1
+            continue
+        return None
+    return None
+
+
 def main(_args=None):
     parser = argparse.ArgumentParser()
     add_global_params(parser)
 
     commands = [
+        Command("adb", adb, "forward raw adb arguments", add_help=False),
         Command("devices", adbdevice, "show android device list"),
         Command("push", adbpush, "push files to android device"),
         Command("pull", adbpull, "pull files to android device"),
@@ -68,10 +90,12 @@ def main(_args=None):
     subparser = parser.add_subparsers(title="sub commands", dest="subcommand")
     addsubcommands(subparser, commands)
 
-    args = parser.parse_args(_args)
+    args, extra = parser.parse_known_args(_args)
     if args.subcommand is None:
+        if extra:
+            parser.error(f"unrecognized arguments: {' '.join(extra)}")
         parser.print_help()
-        exit(0)
+        sys.exit(0)
 
     cfg = Config()
     configpath = args.config or args.default_config
@@ -88,6 +112,16 @@ def main(_args=None):
         cfg = cfg.groups.get(args.group, None)
         if cfg is None:
             parser.error(f"can not fond group: {args.group}")
+
+    if args.subcommand == "adb":
+        raw_args = sys.argv[1:] if _args is None else list(_args)
+        subcommand_index = _find_adb_subcommand_index(raw_args)
+        adb_args = [] if subcommand_index is None else raw_args[subcommand_index + 1 :]
+        if extra != adb_args:
+            parser.error(f"unrecognized arguments: {' '.join(extra)}")
+        args.adb_args = adb_args
+    elif extra:
+        parser.error(f"unrecognized arguments: {' '.join(extra)}")
 
     args.docommand(args, cfg)
 
