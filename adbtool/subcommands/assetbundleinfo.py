@@ -37,7 +37,7 @@ async def extract(file, unity_editor_dir):
 
 async def do_file(input: str, output: str, unity_editor_dir: str, sem: asyncio.Semaphore) -> None:
     if not os.path.isfile(input):
-        raise_error(f"file not fond:{input}")
+        raise_error(f"file not find:{input}")
 
     async with sem:
         with tempfile.TemporaryDirectory() as tmpdirname:
@@ -94,7 +94,7 @@ def docommand(args: argparse.Namespace, cfg: Config) -> None:
             raise_error("output cannot be file when abpath is folder")
         _collect_files(abpath, output, args.ext, files)
     else:
-        raise_error(f"abpath is not exits:{abpath}")
+        raise_error(f"abpath does not exist:{abpath}")
 
     asyncio.run(do_files(files, unity_editor_dir))
 
@@ -102,7 +102,7 @@ def docommand(args: argparse.Namespace, cfg: Config) -> None:
 def addcommand(parser: argparse.ArgumentParser) -> None:
     parser.add_argument("-o", "--output", help="output file or folder")
     parser.add_argument(
-        "-e", "--ext", nargs="?", const="", default=".unity3d", help="assetbundle extions name"
+        "-e", "--ext", nargs="?", const="", default=".unity3d", help="assetbundle extensions name"
     )
     parser.add_argument("-u", "--unityeditordir", nargs="?", help="unity editor folder")
     parser.add_argument("-k", "--keepress", nargs="?", help="keep resS file")
