@@ -26,9 +26,9 @@ classifiers = [
 ]
 
 [project.urls]
-Homepage = "http://github.com/litefeel/pycommon"
-Repository = "http://github.com/litefeel/pycommon.git"
-"Bug Tracker" = "http://github.com/litefeel/pycommon/issues"
+Homepage = "https://github.com/litefeel/adbtool"
+Repository = "https://github.com/litefeel/adbtool.git"
+"Bug Tracker" = "https://github.com/litefeel/adbtool/issues"
 
 [project.scripts]
 adbt = "adbtool.adbtool:main"
