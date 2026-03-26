@@ -2,6 +2,7 @@ import argparse
 import importlib.metadata
 import os
 import sys
+from dataclasses import dataclass
 from typing import Protocol
 
 from .config import Config
@@ -22,14 +23,12 @@ class CommandModule(Protocol):
         ...
 
 
+@dataclass(slots=True)
 class Command:
-    def __init__(
-        self, name: str, command: CommandModule, help: str, add_help: bool = True
-    ) -> None:
-        self.name = name
-        self.command = command
-        self.help = help
-        self.add_help = add_help
+    name: str
+    command: CommandModule
+    help: str
+    add_help: bool = True
 
 
 def addsubcommands(subparser: argparse._SubParsersAction, commands: list[Command]) -> None:

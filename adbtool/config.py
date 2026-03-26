@@ -1,4 +1,5 @@
 from collections.abc import Mapping
+from dataclasses import dataclass, field
 from typing import Protocol, TypeVar, cast
 
 import yaml
@@ -28,13 +29,13 @@ def copy_subconfig(key: str, obj: ConfigSection, subconfig: SupportsLoad) -> Non
         subconfig.load(value)
 
 
+@dataclass(slots=True)
 class PushConfig:
-    def __init__(self) -> None:
-        self.localdir: str = "."
-        self.remotedir: str = "/sdcard"
-        self.recursion: bool = False
-        self.dontpush: bool = False
-        self.paths: list[str] = []
+    localdir: str = "."
+    remotedir: str = "/sdcard"
+    recursion: bool = False
+    dontpush: bool = False
+    paths: list[str] = field(default_factory=list)
 
     def load(self, obj: ConfigSection) -> None:
         self.localdir = get_value("localdir", obj, ".")
@@ -44,12 +45,12 @@ class PushConfig:
         self.dontpush = get_value_bool("dontpush", obj, False)
 
 
+@dataclass(slots=True)
 class PullConfig:
-    def __init__(self) -> None:
-        self.stat: bool = False
-        self.localdir: str = "."
-        self.remotedir: str = "/sdcard"
-        self.paths: list[str] = []
+    stat: bool = False
+    localdir: str = "."
+    remotedir: str = "/sdcard"
+    paths: list[str] = field(default_factory=list)
 
     def load(self, obj: ConfigSection) -> None:
         self.localdir = get_value("localdir", obj, ".")
@@ -58,29 +59,29 @@ class PullConfig:
         self.stat = get_value_bool("stat", obj, False)
 
 
+@dataclass(slots=True)
 class ProcfdConfig:
-    def __init__(self) -> None:
-        self.procname: str = ""
+    procname: str = ""
 
     def load(self, obj: ConfigSection) -> None:
         self.procname = get_value("procname", obj, "")
 
 
+@dataclass(slots=True)
 class ApkConfig:
-    def __init__(self) -> None:
-        self.apkpath: str | None = None
-        self.run: bool = False
+    apkpath: str | None = None
+    run: bool = False
 
     def load(self, obj: ConfigSection) -> None:
         self.apkpath = get_value("apkpath", obj, None)
         self.run = get_value_bool("run", obj, False)
 
 
+@dataclass(slots=True)
 class InstallConfig:
-    def __init__(self) -> None:
-        self.apkpath: str | None = None
-        self.run: bool = False
-        self.devices: str | None = None
+    apkpath: str | None = None
+    run: bool = False
+    devices: str | None = None
 
     def load(self, obj: ConfigSection) -> None:
         self.devices = get_value("devices", obj, None)
@@ -88,55 +89,40 @@ class InstallConfig:
         self.run = get_value_bool("run", obj, False)
 
 
+@dataclass(slots=True)
 class SignConfig:
-    _dct: dict[str, str | None]
-
-    def __init__(self) -> None:
-        self._dct = {}
-
-    @property
-    def ks(self) -> str | None:
-        return self._dct.get("ks")
-
-    @property
-    def ks_pass(self) -> str | None:
-        return self._dct.get("ks-pass")
-
-    @property
-    def ks_key_alias(self) -> str | None:
-        return self._dct.get("ks-key-alias")
-
-    @property
-    def key_pass(self) -> str | None:
-        return self._dct.get("key-pass")
+    ks: str | None = None
+    ks_pass: str | None = None
+    ks_key_alias: str | None = None
+    key_pass: str | None = None
 
     def load(self, obj: ConfigSection) -> None:
-        self._dct["ks"] = get_value("ks", obj, None)
-        self._dct["ks-pass"] = get_value("ks-pass", obj, None)
-        self._dct["ks-key-alias"] = get_value("ks-key-alias", obj, None)
-        self._dct["key-pass"] = get_value("key-pass", obj, None)
+        self.ks = get_value("ks", obj, None)
+        self.ks_pass = get_value("ks-pass", obj, None)
+        self.ks_key_alias = get_value("ks-key-alias", obj, None)
+        self.key_pass = get_value("key-pass", obj, None)
 
 
+@dataclass(slots=True)
 class AssetBundleConfig:
-    def __init__(self) -> None:
-        self.unityeditordir: str | None = None
-        self.keepress: bool = False
+    unityeditordir: str | None = None
+    keepress: bool = False
 
     def load(self, obj: ConfigSection) -> None:
         self.unityeditordir = get_value("unityeditordir", obj, None)
         self.keepress = get_value_bool("keepress", obj, False)
 
 
+@dataclass(slots=True)
 class Config:
-    def __init__(self) -> None:
-        self.push = PushConfig()
-        self.pull = PullConfig()
-        self.apk = ApkConfig()
-        self.install = InstallConfig()
-        self.sign = SignConfig()
-        self.procfd = ProcfdConfig()
-        self.assetbundle = AssetBundleConfig()
-        self.groups: dict[str, Config] = {}
+    push: PushConfig = field(default_factory=PushConfig)
+    pull: PullConfig = field(default_factory=PullConfig)
+    apk: ApkConfig = field(default_factory=ApkConfig)
+    install: InstallConfig = field(default_factory=InstallConfig)
+    sign: SignConfig = field(default_factory=SignConfig)
+    procfd: ProcfdConfig = field(default_factory=ProcfdConfig)
+    assetbundle: AssetBundleConfig = field(default_factory=AssetBundleConfig)
+    groups: dict[str, "Config"] = field(default_factory=dict)
 
     def load(self, obj: ConfigSection) -> None:
         copy_subconfig("push", obj, self.push)
