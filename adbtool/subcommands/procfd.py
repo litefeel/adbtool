@@ -16,9 +16,8 @@ def _get_pid(procname: str) -> str:
     cmd = f'"{getAdb()}" -s {g_serial} shell "ps -A | grep {procname}"'
     print(cmd)
     output, isok = call(cmd, False)
-    assert output
     if not isok or not output:
-        raise BaseException(f"No such process: {procname}")
+        raise_error(f"No such process: {procname}")
     return output.split()[1]
 
 def _print_proc_fd(pid: str) -> None:
@@ -41,7 +40,8 @@ def docommand(args: argparse.Namespace, cfg: Config) -> None:
     g_cfg = cfg.procfd
 
     procname = args.procname or g_cfg.procname
-    assert procname
+    if not procname:
+        raise_error("Missing parameter: procname")
     g_cfg.procname = procname
 
     for device in devices:

@@ -42,9 +42,11 @@ async def do_file(input: str, output: str, unity_editor_dir: str, sem: asyncio.S
             tmpunityfile = os.path.join(tmpdirname, "tmp.unity3d")
             shutil.copy(input, tmpunityfile)
             resfile = await extract(tmpunityfile, unity_editor_dir)
-            assert resfile
+            if not resfile:
+                raise_error(f"failed to extract assetbundle file: {input}")
             outfile = await bine2text(resfile, unity_editor_dir)
-            assert outfile
+            if not outfile:
+                raise_error(f"failed to convert extracted file to text: {resfile}")
             makedirs(output, True)
             shutil.copyfile(outfile, output)
             with open(output, mode='wb') as f:
