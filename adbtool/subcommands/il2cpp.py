@@ -2,7 +2,6 @@ import argparse
 import os
 from zipfile import ZipFile
 
-from genericpath import isdir, isfile
 from litefeel.pycommon.io import makedirs, write_file
 
 from ..cmd import call

@@ -1,7 +1,5 @@
 import argparse
-from genericpath import isdir, isfile
 import os
-from posixpath import abspath
 import re
 import tempfile
 import shutil

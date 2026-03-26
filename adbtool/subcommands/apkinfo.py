@@ -1,5 +1,4 @@
 import argparse
-from os import error
 import os.path
 import re
 
