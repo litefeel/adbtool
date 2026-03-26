@@ -10,8 +10,7 @@ BASE_DIR = ""
 
 
 def getApks(path, filters):
-    apks = os.listdir(path)
-    apks = filter(lambda filename: filename.endswith(".apk"), apks)
+    apks = [filename for filename in os.listdir(path) if filename.endswith(".apk")]
     if filters is not None:
 
         def myfilterfun(filename):
@@ -20,9 +19,8 @@ def getApks(path, filters):
                     return False
             return True
 
-        apks = filter(myfilterfun, apks)
-    apks = map(lambda filename: os.path.join(path, filename), apks)
-    return list(apks)
+        apks = [filename for filename in apks if myfilterfun(filename)]
+    return [os.path.join(path, filename) for filename in apks]
 
 
 def getNewst(apks: list[str]) -> str | None:

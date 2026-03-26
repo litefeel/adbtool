@@ -100,7 +100,7 @@ def getAapt() -> str:
 
     buildtools = os.path.join(androidHome, "build-tools")
     if os.path.isdir(buildtools):
-        vers = list(map(lambda v: Version(v), os.listdir(buildtools)))
+        vers = [Version(v) for v in os.listdir(buildtools)]
         vers.sort(reverse=True)
         for ver in vers:
             filename = os.path.join(buildtools, str(ver), aaptname)
@@ -125,7 +125,7 @@ def getZipalign() -> str:
 
     buildtools = os.path.join(androidHome, "build-tools")
     if os.path.isdir(buildtools):
-        vers = list(map(lambda v: Version(v), os.listdir(buildtools)))
+        vers = [Version(v) for v in os.listdir(buildtools)]
         vers.sort(reverse=True)
         for ver in vers:
             filename = os.path.join(buildtools, str(ver), aaptname)
@@ -150,7 +150,7 @@ def getApksigner() -> str:
 
     buildtools = os.path.join(androidHome, "build-tools")
     if os.path.isdir(buildtools):
-        vers = list(map(lambda v: Version(v), os.listdir(buildtools)))
+        vers = [Version(v) for v in os.listdir(buildtools)]
         vers.sort(reverse=True)
         for ver in vers:
             filename = os.path.join(buildtools, str(ver), aaptname)
@@ -173,7 +173,7 @@ def get_objdump() -> str:
     # C:\Users\Admin\AppData\Local\Android\Sdk\ndk\23.1.7779620\toolchains\llvm\prebuilt\windows-x86_64\bin\llvm-objdump.exe
     buildtools = os.path.join(androidHome, "ndk")
     if os.path.isdir(buildtools):
-        vers = list(map(lambda v: Version(v), os.listdir(buildtools)))
+        vers = [Version(v) for v in os.listdir(buildtools)]
         vers.sort(reverse=True)
         for ver in vers:
             filename = os.path.join(buildtools, str(ver), exename)

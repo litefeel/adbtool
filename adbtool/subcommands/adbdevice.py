@@ -44,9 +44,7 @@ def get_devices() -> list[Device]:
 
 def getDevicesBySerial(devices:list[Device], serial):
     serial = serial.lower()
-    return list(
-        filter(lambda device: device.serial.lower().startswith(serial), devices)
-    )
+    return [device for device in devices if device.serial.lower().startswith(serial)]
 
 
 # return
