@@ -2,7 +2,7 @@ import argparse
 import importlib.metadata
 import os
 import sys
-from typing import Any
+from typing import Protocol
 
 from .config import Config
 from .subcommands import (adb, adbdevice, adbpull, adbpush, apkinfo, apkinstall,
@@ -14,8 +14,18 @@ def get_version() -> str:
     return importlib.metadata.version("adbtool")
 
 
+class CommandModule(Protocol):
+    def docommand(self, args: argparse.Namespace, cfg: Config) -> None:
+        ...
+
+    def addcommand(self, parser: argparse.ArgumentParser) -> None:
+        ...
+
+
 class Command:
-    def __init__(self, name: str, command: Any, help: str, add_help: bool = True):
+    def __init__(
+        self, name: str, command: CommandModule, help: str, add_help: bool = True
+    ) -> None:
         self.name = name
         self.command = command
         self.help = help
@@ -66,7 +76,7 @@ def _find_adb_subcommand_index(argv: list[str]) -> int | None:
     return None
 
 
-def main(_args=None):
+def main(_args: list[str] | None = None) -> None:
     parser = argparse.ArgumentParser()
     add_global_params(parser)
 
