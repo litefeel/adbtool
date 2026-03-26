@@ -132,7 +132,7 @@ def getZipalign() -> str:
             if os.path.isfile(filename):
                 return filename
 
-    raise_error("can not found aapt in ANDROID_HOME/ANDROID_SDK")
+    raise_error("can not found zipalign in ANDROID_HOME/ANDROID_SDK")
 
 
 def getApksigner() -> str:
@@ -157,7 +157,7 @@ def getApksigner() -> str:
             if os.path.isfile(filename):
                 return filename
 
-    raise_error("can not found aapt in ANDROID_HOME/ANDROID_SDK")
+    raise_error("can not found apksigner in ANDROID_HOME/ANDROID_SDK")
 
 def get_objdump() -> str:
     androidHome = os.getenv("ANDROID_HOME")
@@ -181,7 +181,7 @@ def get_objdump() -> str:
                 return filename
 
 
-    raise_error("can not found aapt in ANDROID_HOME/ANDROID_SDK")
+    raise_error("can not found objdump in ANDROID_HOME/ANDROID_SDK")
 
 def get_unity_editor_dir(editor_dir: str) -> str:
     def is_editor_dir(dir):
