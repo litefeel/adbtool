@@ -28,7 +28,7 @@ options:
 
 sub commands:
   {adb,devices,push,install,uninstall,apk,sign,ab,il2cpp}
-    adb                 forward raw adb arguments
+    adb                 forward adb arguments to selected devices
     devices             show android device list
     push                push files to android device
     install             install apk file
@@ -42,13 +42,25 @@ sub commands:
 ---
 
 ~~~
-adbt adb devices
-adbt adb -d shell
-adbt adb -H localhost devices
+adbt adb -- devices
+adbt adb -d 1 -- shell
+adbt adb -d a -- shell pwd
+adbt adb -- -H localhost devices
+adbt adb -d 1 -- -d shell
 ~~~
 
-`adbt adb ...` is a raw passthrough to the real `adb` binary, so adb options such as
-`-d`, `-s`, `-H`, `--help`, and `--version` keep their native meaning.
+`adbt adb` supports the same device selection flow as `install`, and adb arguments must
+be placed after `--`.
+
+- `-d/--devices` before `--` belongs to `adbt adb`
+- everything after `--` is passed to the real `adb` binary without extra parsing
+- `adbt adb -h` shows the `adbt` subcommand help
+- `adbt adb -- -h` shows the real `adb` help
+
+~~~
+adbt adb -h
+usage: adbt adb [-h] [-d [DEVICES ...]] -- [adb_args ...]
+~~~
 
 ---
 
