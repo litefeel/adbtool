@@ -1,7 +1,7 @@
 import argparse
 import os
 
-from ..cmd import call, getAdb
+from ..cmd import call_argv, getAdb
 from ..config import Config
 from . import adbdevice, apkinfo
 
@@ -30,29 +30,29 @@ def getNewst(apks: list[str]) -> str | None:
     return apks[0]
 
 
-def filterApks(fileorpath: str, filters) -> str | None:
-    apk = fileorpath
-
+def filterApks(fileorpath: str, filters) -> list[str]:
     if os.path.isdir(fileorpath):
         apks = getApks(fileorpath, filters)
         if len(apks) == 0:
             print("can not found apk file in %s " % fileorpath)
             exit(1)
-        apk = getNewst(apks)
-    return apk
+        return [getNewst(apks)]
+    return [fileorpath]
 
 
-def install(apks: list[str], serials: list[str], run: bool) -> None:
+def install(apks: list[str], serials: list[str], run: bool, force: bool) -> None:
     adb = getAdb()
-    last = len(apks) - 1
-    for i, apk in enumerate(apks):
-        isrun = run and last == i
-        for serial in serials:
-            cmd = f'"{adb}" -s {serial} install -r "{apk}"'
-            _, isOk = call(cmd, True)
-            print(isOk)
-            if isOk and isrun:
-                apkinfo.run(apk, [serial])
+    subcommand = "install-multi-package" if len(apks) > 1 else "install"
+    install_args = ["-d", "-r"] if force else ["-r"]
+    target_apk = apks[-1]
+
+    for serial in serials:
+        cmd = [adb, "-s", serial, subcommand, *install_args, *apks]
+        _, code = call_argv(cmd, True)
+        isOk = code == 0
+        print(isOk)
+        if isOk and run:
+            apkinfo.run(target_apk, [serial])
 
 
 def docommand(args: argparse.Namespace, cfg: Config) -> None:
@@ -60,19 +60,22 @@ def docommand(args: argparse.Namespace, cfg: Config) -> None:
     if not serials:
         exit(0)
 
-    path = args.apkpath or cfg.install.apkpath or "."
-    path = os.path.abspath(os.path.join(BASE_DIR, path))
+    paths = args.apkpath or [cfg.install.apkpath or "."]
+    paths = [os.path.abspath(os.path.join(BASE_DIR, path)) for path in paths]
 
-    apks = filterApks(path, args.filter)
+    apks: list[str] = []
+    for path in paths:
+        apks.extend(filterApks(path, args.filter))
 
-    if serials is not None and apks is not None:
-        install([apks], serials, args.run or cfg.install.run)
+    if serials is not None and apks:
+        install(apks, serials, args.run or cfg.install.run, args.force)
 
 
 def addcommand(parser: argparse.ArgumentParser) -> None:
-    parser.add_argument("-f", "--filter", nargs="*", help="filtered by file name")
+    parser.add_argument("-f", "--force", action="store_true", help="install with adb -d -r")
+    parser.add_argument("--filter", nargs="*", help="filtered by file name")
     parser.add_argument(
         "-r", "--run", action="store_true", help="run app after install"
     )
-    parser.add_argument("apkpath", nargs="?")
+    parser.add_argument("apkpath", nargs="*")
     adbdevice.addArgumentParser(parser)

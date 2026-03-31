@@ -103,20 +103,24 @@ optional arguments:
 ---
 ~~~
 adbt install -h
-usage: adbt [options] install [-h] [-f [FILTER [FILTER ...]]] [-r] [-d [DEVICES [DEVICES ...]]] [apkpath]
+usage: adbt [options] install [-h] [-f] [--filter [FILTER ...]] [-r] [-d [DEVICES [DEVICES ...]]] [apkpath ...]
 
 positional arguments:
   apkpath
 
 optional arguments:
   -h, --help            show this help message and exit
-  -f [FILTER [FILTER ...]], --filter [FILTER [FILTER ...]]
+  -f, --force           install with adb -d -r
+  --filter [FILTER [FILTER ...]]
                         filtered by file name
   -r, --run             run app after install
   -d [DEVICES [DEVICES ...]], --devices [DEVICES [DEVICES ...]]
                         filter of devices, [a | n | serial] a: all devices n: index of devices list(start with 1)
                         serial: devices serial (at least 2 char) not argument is show device list
 ~~~
+
+- `install` accepts multiple apk paths and uses `adb install-multi-package` when more than one apk is provided.
+- default install mode uses `adb -r`; `-f/--force` upgrades it to `adb -d -r`.
 ---
 ~~~
 adbt apk -h
