@@ -1,4 +1,5 @@
 import os
+import threading
 
 import pytest
 
@@ -186,3 +187,54 @@ def test_install_run_skips_launch_on_failure(monkeypatch):
     adbtool.main(["install", "-r", apk])
 
     assert run_calls == []
+
+
+def test_install_runs_multiple_serials_in_parallel(monkeypatch):
+    calls = []
+    entered = []
+    release = threading.Event()
+    both_started = threading.Event()
+    lock = threading.Lock()
+
+    def fake_get_adb():
+        return "adb-bin"
+
+    def fake_call_argv(args, printOutput=False):
+        with lock:
+            calls.append((list(args), printOutput))
+            entered.append(args[2])
+            if len(entered) == 2:
+                both_started.set()
+        assert both_started.wait(1), "expected both installs to start before either completed"
+        assert release.wait(1), "timed out waiting to release parallel install"
+        return "", 0
+
+    monkeypatch.setattr(apkinstall, "getAdb", fake_get_adb)
+    monkeypatch.setattr(apkinstall, "call_argv", fake_call_argv)
+    _mock_devices(monkeypatch, ["serial-1", "serial-2"])
+    _mock_fs(monkeypatch)
+    apk = os.path.join(os.getcwd(), "app.apk")
+
+    worker = threading.Thread(target=adbtool.main, args=(["install", apk],))
+    worker.start()
+    assert both_started.wait(1), "install did not dispatch both serials concurrently"
+    release.set()
+    worker.join(1)
+
+    assert not worker.is_alive()
+    assert calls == [
+        (["adb-bin", "-s", "serial-1", "install", "-r", apk], True),
+        (["adb-bin", "-s", "serial-2", "install", "-r", apk], True),
+    ]
+
+
+def test_install_run_only_launches_successful_serials(monkeypatch):
+    _mock_install(monkeypatch, returncodes=[0, 1])
+    run_calls = _mock_run(monkeypatch)
+    _mock_devices(monkeypatch, ["serial-1", "serial-2"])
+    _mock_fs(monkeypatch)
+    apk = os.path.join(os.getcwd(), "app.apk")
+
+    adbtool.main(["install", "-r", apk])
+
+    assert run_calls == [(apk, ["serial-1"])]

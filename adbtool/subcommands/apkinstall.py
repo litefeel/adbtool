@@ -1,5 +1,6 @@
 import argparse
 import os
+from concurrent.futures import Future, ThreadPoolExecutor
 
 from ..cmd import call_argv, getAdb
 from ..config import Config
@@ -46,13 +47,20 @@ def install(apks: list[str], serials: list[str], run: bool, force: bool) -> None
     install_args = ["-d", "-r"] if force else ["-r"]
     target_apk = apks[-1]
 
-    for serial in serials:
+    def install_one(serial: str) -> int:
         cmd = [adb, "-s", serial, subcommand, *install_args, *apks]
         _, code = call_argv(cmd, True)
-        isOk = code == 0
-        print(isOk)
-        if isOk and run:
-            apkinfo.run(target_apk, [serial])
+        return code
+
+    with ThreadPoolExecutor(max_workers=len(serials)) as executor:
+        futures: list[tuple[str, Future[int]]] = [
+            (serial, executor.submit(install_one, serial)) for serial in serials
+        ]
+        for serial, future in futures:
+            isOk = future.result() == 0
+            print(isOk)
+            if isOk and run:
+                apkinfo.run(target_apk, [serial])
 
 
 def docommand(args: argparse.Namespace, cfg: Config) -> None:
