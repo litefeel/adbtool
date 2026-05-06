@@ -9,16 +9,18 @@ _IGNORE_PREFIXS = ("List of devices attached", "* daemon")
 class Device:
     """docstring for Device"""
 
-    __slots__ = ("serial", "online", "product", "model", "device", "raw")
+    __slots__ = ("serial", "state", "online", "product", "model", "device", "raw")
 
     def __init__(self, line: str):
         self.raw = line
         arr = line.split()
+        details = dict(item.split(":", 1) for item in arr[2:] if ":" in item)
         self.serial = arr[0]
-        self.online = arr[1] == "device"
-        self.product = arr[2].replace("product:", "")
-        self.model = arr[3].replace("model:", "")
-        self.device = arr[4].replace("device:", "")
+        self.state = arr[1]
+        self.online = self.state == "device"
+        self.product = details.get("product", "")
+        self.model = details.get("model", "")
+        self.device = details.get("device", "")
 
 
 def listOneItem(arr, index):
@@ -36,20 +38,32 @@ def get_devices() -> list[Device]:
         if len(lines) > 1:
             # skip first line "List of devices attached"
             for line in lines:
-                if not line.startswith(_IGNORE_PREFIXS):
+                if line and not line.startswith(_IGNORE_PREFIXS):
                     devices.append(Device(line))
     devices.sort(key=lambda x: x.serial.lower())
     return devices
 
 
-def getDevicesBySerial(devices:list[Device], serial):
-    serial = serial.lower()
-    return [device for device in devices if device.serial.lower().startswith(serial)]
+def printUnavailableDevices(devices: list[Device]) -> None:
+    for device in devices:
+        if device.online:
+            continue
+
+        if device.state == "unauthorized":
+            print(
+                f"Device {device.serial} is unauthorized. "
+                "Please allow USB debugging on the device and try again."
+            )
+        elif device.state == "offline":
+            print(
+                f"Device {device.serial} is offline. "
+                "Please reconnect it or run `adb reconnect` and try again."
+            )
+        else:
+            print(f"Device {device.serial} is {device.state}.")
 
 
-# return
-#   List: matched devices
-def filterDevices(devices: list[Device], args) -> list[Device]:
+def selectDevices(devices: list[Device], args) -> list[Device]:
     if len(devices) == 0:
         print("No devices connected")
         return []
@@ -77,6 +91,17 @@ def filterDevices(devices: list[Device], args) -> list[Device]:
         if device is not None:
             selects.append(device)
     return selects
+
+
+def getDevicesBySerial(devices:list[Device], serial):
+    serial = serial.lower()
+    return [device for device in devices if device.serial.lower().startswith(serial)]
+
+
+# return
+#   List: matched devices
+def filterDevices(devices: list[Device], args) -> list[Device]:
+    return [device for device in selectDevices(devices, args) if device.online]
 
 
 def printDevices(devices: list[Device]):
@@ -110,7 +135,13 @@ def doArgumentParser(args) -> tuple[list[str], list[Device]]:
         printDevices(devices)
         return ([], [])
 
-    devices = filterDevices(devices, args.devices)
+    devices = selectDevices(devices, args.devices)
+    unavailable_devices = [device for device in devices if not device.online]
+    if unavailable_devices:
+        printUnavailableDevices(unavailable_devices)
+        print("Abort: all target devices must be available.")
+        raise SystemExit(1)
+
     serials = getSerials(devices)
     return (serials, devices)
 
