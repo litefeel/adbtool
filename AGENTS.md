@@ -5,7 +5,7 @@ repository.
 
 ## Project Overview
 
-- `adbtool` is a Python 3.10+ package that provides the `adbt` command-line tool.
+- `adbtool` is a Python 3.11+ package that provides the `adbt` command-line tool.
 - The package entry point is declared in `pyproject.toml`:
   `adbt = "adbtool.adbtool:main"`.
 - Core package code lives in `adbtool/`.

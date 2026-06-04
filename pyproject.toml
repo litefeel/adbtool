@@ -10,7 +10,7 @@ dependencies = [
   "PyYAML",
   "semantic_version",
 ]
-requires-python = ">=3.10"
+requires-python = ">=3.11"
 authors = [
   {name = "litefeel", email = "litefeel@gmail.com"},
 ]
@@ -40,7 +40,7 @@ dev = [
 
 [tool.ruff]
 line-length = 100
-target-version = "py310"
+target-version = "py311"
 
 [tool.ruff.format]
 line-ending = "auto"
