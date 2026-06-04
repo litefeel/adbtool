@@ -15,6 +15,7 @@ jobs:
       name: pypi
       url: https://pypi.org/p/adbtool
     permissions:
+      contents: read
       id-token: write  # IMPORTANT: this permission is mandatory for trusted publishing
 
     steps:
