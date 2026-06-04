@@ -8,7 +8,19 @@ A friendly android adb command-line tool
 
 ### Python Requirements
 * python 3.10+
+* uv
 * Android SDK
+
+
+### Development
+
+~~~
+uv sync
+uv run pytest
+uv run pytest tests/test_cmd.py
+uv run ruff format adbtool tests
+uv build
+~~~
 
 
 ### Commands

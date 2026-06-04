@@ -1,6 +1,4 @@
 import argparse
-from enum import IntEnum, auto
-import os
 
 from adbtool.errors import raise_error
 
@@ -14,6 +12,7 @@ g_serial = ""
 #     List = 1
 #     Count = auto()
 
+
 def _get_pid(procname: str) -> str:
     cmd = f'"{getAdb()}" -s {g_serial} shell "ps -A | grep {procname}"'
     print(cmd)
@@ -22,9 +21,11 @@ def _get_pid(procname: str) -> str:
         raise_error(f"No such process: {procname}")
     return output.split()[1]
 
+
 def _print_proc_fd(pid: str) -> None:
     cmd = f'"{getAdb()}" -s {g_serial} shell ls -lha /proc/{pid}/fd'
     call(cmd, True)
+
 
 def _print_proc(cfg: ProcfdConfig, serial: str) -> None:
     global g_serial
@@ -63,5 +64,7 @@ def addcommand(parser: argparse.ArgumentParser) -> None:
     #     dest="_type",
     #     help="type 1:count 2:list 3:all",
     # )
-    parser.add_argument("procname", nargs="?", help="process name, will pull all files in /proc/<pid>/fd/")
+    parser.add_argument(
+        "procname", nargs="?", help="process name, will pull all files in /proc/<pid>/fd/"
+    )
     adbdevice.addArgumentParser(parser)

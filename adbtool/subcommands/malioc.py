@@ -59,17 +59,17 @@ def _parse_shader(lines: Iterator[str]) -> tuple[str, list[ShaderInfo]]:
             vert = _read_shader_body(lines, "VERTEX")
             frag = _read_shader_body(lines, "FRAGMENT")
             if "INSTANCING_ON" in global_keywords:
-                vert = vert.replace('#version 300 es', '#version 310 es')
-                frag = frag.replace('#version 300 es', '#version 310 es')
+                vert = vert.replace("#version 300 es", "#version 310 es")
+                frag = frag.replace("#version 300 es", "#version 310 es")
             infos.append(ShaderInfo(global_keywords, local_keywords, vert, frag))
     except StopIteration:
         pass
     return shadername, infos
 
 
-def _append_output(text:str, lst:list[str])->None:
-    for line in text.replace('\r\n', '\n').splitlines(keepends=False):
-        lst.append('    ' + line)
+def _append_output(text: str, lst: list[str]) -> None:
+    for line in text.replace("\r\n", "\n").splitlines(keepends=False):
+        lst.append("    " + line)
 
 
 def do_file(file: str, output_file: str) -> None:
@@ -81,7 +81,6 @@ def do_file(file: str, output_file: str) -> None:
     with tempfile.TemporaryDirectory() as tmpdirname:
         vertfile = os.path.join(tmpdirname, "shader.vert")
         fragfile = os.path.join(tmpdirname, "shader.frag")
-        outputfile = os.path.join(tmpdirname, "output.txt")
         for info in infos:
             lst.append("=================================================")
             lst.append("Global Keywords:" + info.global_keywords)

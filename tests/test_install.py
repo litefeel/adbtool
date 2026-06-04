@@ -43,7 +43,9 @@ def _mock_run(monkeypatch):
 
 
 def _mock_fs(monkeypatch, directories=None, mtimes=None):
-    directory_map = {} if directories is None else {os.path.abspath(k): v for k, v in directories.items()}
+    directory_map = (
+        {} if directories is None else {os.path.abspath(k): v for k, v in directories.items()}
+    )
     mtime_map = {} if mtimes is None else {os.path.abspath(k): v for k, v in mtimes.items()}
 
     def fake_isdir(path):

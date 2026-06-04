@@ -1,5 +1,0 @@
-litefeel-pycommon>=0.4.15
-PyYAML
-var_dump
-pytest
-semantic_version

@@ -49,9 +49,7 @@ def pull(file: str, prefixLocal: str, prefixRemote: str) -> bool:
     if file.startswith(prefixLocal):
         remote = prefixRemote + file[len(prefixLocal) :]
 
-    _, isOk = call(
-        f'"{getAdb()}" -s {g_serial} pull "{remote}" "{local}"', True
-    )
+    _, isOk = call(f'"{getAdb()}" -s {g_serial} pull "{remote}" "{local}"', True)
     return isOk
 
 
@@ -71,9 +69,7 @@ def push(file: str, prefixLocal: str, prefixRemote: str, dontpush: bool) -> None
         isOk = True
         if not dontpush:
             rellocal = os.path.relpath(local, ".")
-            _, isOk = call(
-                f'"{getAdb()}" -s {g_serial} push "{rellocal}" "{remote}"', True
-            )
+            _, isOk = call(f'"{getAdb()}" -s {g_serial} push "{rellocal}" "{remote}"', True)
         if isOk:
             date_dict[relname] = nowhash
         else:
@@ -187,9 +183,7 @@ def docommand(args: argparse.Namespace, cfg: Config) -> None:
 
 
 def addcommand(parser: argparse.ArgumentParser) -> None:
-    parser.add_argument(
-        "-r", dest="recursion", action="store_true", help="recursion all file"
-    )
+    parser.add_argument("-r", dest="recursion", action="store_true", help="recursion all file")
     parser.add_argument(
         "-n",
         dest="newst",

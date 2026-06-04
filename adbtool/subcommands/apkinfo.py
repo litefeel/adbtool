@@ -18,9 +18,7 @@ def parse(apk):
     output, isOk = call(cmd)
     if isOk:
         packagename = firstitem(re.findall(r"package: name='(\S+?)'", output))
-        activityname = firstitem(
-            re.findall(r"launchable-activity: name='(\S+?)'", output)
-        )
+        activityname = firstitem(re.findall(r"launchable-activity: name='(\S+?)'", output))
         return (packagename, activityname, output)
     return (None, None, None)
 

@@ -159,6 +159,7 @@ def getApksigner() -> str:
 
     raise_error("can not found apksigner in ANDROID_HOME/ANDROID_SDK")
 
+
 def get_objdump() -> str:
     androidHome = os.getenv("ANDROID_HOME")
     if androidHome is None:
@@ -180,8 +181,8 @@ def get_objdump() -> str:
             if os.path.isfile(filename):
                 return filename
 
-
     raise_error("can not found objdump in ANDROID_HOME/ANDROID_SDK")
+
 
 def get_unity_editor_dir(editor_dir: str) -> str:
     def is_editor_dir(dir):
@@ -209,7 +210,7 @@ def get_unity_binary2text(unity_editor_dir):
         return os.path.join(get_unity_editor_dir(unity_editor_dir), "Data/Tools/binary2text")
     if current_platform == "Darwin":
         return os.path.join(get_unity_editor_dir(unity_editor_dir), "Contents/Tools/binary2text")
-    
+
     raise_error("unsupport platform")
 
 
@@ -219,8 +220,9 @@ def get_unity_webextract(unity_editor_dir):
         return os.path.join(get_unity_editor_dir(unity_editor_dir), "Data/Tools/WebExtract")
     if current_platform == "Darwin":
         return os.path.join(get_unity_editor_dir(unity_editor_dir), "Contents/Tools/WebExtract")
-    
+
     raise_error("unsupport platform")
+
 
 def get_malioc():
     malioc = os.getenv("MALIOC")

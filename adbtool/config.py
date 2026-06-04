@@ -10,8 +10,7 @@ T = TypeVar("T")
 
 
 class SupportsLoad(Protocol):
-    def load(self, obj: ConfigSection) -> None:
-        ...
+    def load(self, obj: ConfigSection) -> None: ...
 
 
 def get_value(key: str, obj: ConfigSection, default: T) -> T:

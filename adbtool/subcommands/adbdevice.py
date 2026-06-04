@@ -93,7 +93,7 @@ def selectDevices(devices: list[Device], args) -> list[Device]:
     return selects
 
 
-def getDevicesBySerial(devices:list[Device], serial):
+def getDevicesBySerial(devices: list[Device], serial):
     serial = serial.lower()
     return [device for device in devices if device.serial.lower().startswith(serial)]
 

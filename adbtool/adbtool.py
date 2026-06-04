@@ -6,9 +6,22 @@ from dataclasses import dataclass
 from typing import Protocol
 
 from .config import Config
-from .subcommands import (adb, adbdevice, adbpull, adbpush, apkinfo, apkinstall,
-                          apksigner, apkuninstall, assetbundleinfo, asshader,
-                          il2cpp, malioc, pagesize, procfd)
+from .subcommands import (
+    adb,
+    adbdevice,
+    adbpull,
+    adbpush,
+    apkinfo,
+    apkinstall,
+    apksigner,
+    apkuninstall,
+    assetbundleinfo,
+    asshader,
+    il2cpp,
+    malioc,
+    pagesize,
+    procfd,
+)
 
 
 def get_version() -> str:
@@ -16,11 +29,9 @@ def get_version() -> str:
 
 
 class CommandModule(Protocol):
-    def docommand(self, args: argparse.Namespace, cfg: Config) -> None:
-        ...
+    def docommand(self, args: argparse.Namespace, cfg: Config) -> None: ...
 
-    def addcommand(self, parser: argparse.ArgumentParser) -> None:
-        ...
+    def addcommand(self, parser: argparse.ArgumentParser) -> None: ...
 
 
 @dataclass(slots=True)

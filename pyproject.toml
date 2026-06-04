@@ -9,7 +9,6 @@ dependencies = [
   "litefeel-pycommon>=0.4.15",
   "PyYAML",
   "semantic_version",
-  "var_dump"
 ]
 requires-python = ">=3.10"
 authors = [
@@ -33,7 +32,15 @@ Repository = "https://github.com/litefeel/adbtool.git"
 [project.scripts]
 adbt = "adbtool.adbtool:main"
 
+[dependency-groups]
+dev = [
+  "pytest",
+  "ruff",
+]
 
-
-[tool.black]
+[tool.ruff]
 line-length = 100
+target-version = "py310"
+
+[tool.ruff.format]
+line-ending = "auto"

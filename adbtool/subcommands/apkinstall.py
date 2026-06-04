@@ -82,8 +82,6 @@ def docommand(args: argparse.Namespace, cfg: Config) -> None:
 def addcommand(parser: argparse.ArgumentParser) -> None:
     parser.add_argument("-f", "--force", action="store_true", help="install with adb -d -r")
     parser.add_argument("--filter", nargs="*", help="filtered by file name")
-    parser.add_argument(
-        "-r", "--run", action="store_true", help="run app after install"
-    )
+    parser.add_argument("-r", "--run", action="store_true", help="run app after install")
     parser.add_argument("apkpath", nargs="*")
     adbdevice.addArgumentParser(parser)

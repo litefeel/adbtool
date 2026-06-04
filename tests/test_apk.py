@@ -1,5 +1,5 @@
 import pytest
-from pytest import raises
+
 from adbtool import adbtool
 
 
@@ -112,8 +112,8 @@ densities: '160' '240' '320' '480' '640'"""
 def test_apkinfo(capsys):
     adbtool.main(["apk", "./test/adbtooltest.apk"])
     captured = capsys.readouterr()
-    out:str = captured.out
-    out = out.strip().replace('\r\n', '\n')
+    out: str = captured.out
+    out = out.strip().replace("\r\n", "\n")
     assert out == APK_INFO
     assert captured.err == ""
 

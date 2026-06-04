@@ -2,7 +2,7 @@ import argparse
 import os
 from enum import IntEnum, auto
 
-from litefeel.pycommon.io import makedirs, read_lines, write_lines
+from litefeel.pycommon.io import read_lines, write_lines
 
 from ..config import Config
 from ..errors import raise_error
@@ -22,7 +22,6 @@ def _lstrips(lines: list[str]) -> None:
 def _format(lines: list[str]) -> None:
     space = ""
     for i, line in enumerate(lines):
-
         prev_space = space
         n = 0
         if "{" in line:
@@ -112,7 +111,11 @@ def addcommand(parser: argparse.ArgumentParser) -> None:
         "-s",
         "--simplify",
         nargs="?",
-        choices=[SimplifyType.Format.value, SimplifyType.RemoveContent.value, SimplifyType.OnlyKeyWord.value],
+        choices=[
+            SimplifyType.Format.value,
+            SimplifyType.RemoveContent.value,
+            SimplifyType.OnlyKeyWord.value,
+        ],
         default=SimplifyType.Format.value,
         type=int,
         help=f"simplify file 1:format 2:remove shader content 3:only keyword keeps default:{SimplifyType.Format.value}",

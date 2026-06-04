@@ -10,20 +10,27 @@ from ..errors import raise_error
 
 
 def extract(file, output_folder):
-    zipfile = ZipFile(file, 'r')
-    write_file(os.path.join(output_folder, "libil2cpp.so"), zipfile.read("lib/arm64-v8a/libil2cpp.so"))
-    write_file(os.path.join(output_folder, "global-metadata.dat"), zipfile.read("assets/bin/Data/Managed/Metadata/global-metadata.dat"))
+    zipfile = ZipFile(file, "r")
+    write_file(
+        os.path.join(output_folder, "libil2cpp.so"), zipfile.read("lib/arm64-v8a/libil2cpp.so")
+    )
+    write_file(
+        os.path.join(output_folder, "global-metadata.dat"),
+        zipfile.read("assets/bin/Data/Managed/Metadata/global-metadata.dat"),
+    )
     zipfile.close()
+
 
 def do_file(apkfile, output_folder):
     if not os.path.isfile(apkfile):
-        raise_error(f'file not find:{apkfile}')
+        raise_error(f"file not find:{apkfile}")
 
     extract(apkfile, output_folder)
     il2cppso = os.path.join(output_folder, "libil2cpp.so")
     metadatadat = os.path.join(output_folder, "global-metadata.dat")
     cmd = f'Il2CppDumper.exe "{il2cppso}" "{metadatadat}" "{output_folder}"'
     call(cmd)
+
 
 def docommand(args: argparse.Namespace, cfg: Config) -> None:
     output = args.output

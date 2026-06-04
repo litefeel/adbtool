@@ -1,10 +1,10 @@
 import argparse
-import os
-import re
-import tempfile
-import shutil
-from litefeel.pycommon.io import makedirs, write_file, read_file
 import asyncio
+import os
+import shutil
+import tempfile
+
+from litefeel.pycommon.io import makedirs, read_file
 
 from ..cmd import call_async, get_unity_binary2text, get_unity_webextract
 from ..config import Config
@@ -49,11 +49,12 @@ async def do_file(input: str, output: str, unity_editor_dir: str, sem: asyncio.S
                 raise_error(f"failed to convert extracted file to text: {resfile}")
             makedirs(output, True)
             shutil.copyfile(outfile, output)
-            with open(output, mode='wb') as f:
-                f.write(os.path.basename(resfile).encode('utf-8'))
+            with open(output, mode="wb") as f:
+                f.write(os.path.basename(resfile).encode("utf-8"))
                 f.write(b"\n\n")
                 f.write(read_file(outfile, True))
-                
+
+
 def _collect_files(
     input_dir: str, output_dir: str, ext: str, filelist: list[tuple[str, str]]
 ) -> None:
