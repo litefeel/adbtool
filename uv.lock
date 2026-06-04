@@ -4,7 +4,7 @@ requires-python = ">=3.11"
 
 [[package]]
 name = "adbtool"
-version = "0.0.37"
+version = "0.0.38"
 source = { editable = "." }
 dependencies = [
     { name = "litefeel-pycommon" },
