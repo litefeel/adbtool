@@ -1,0 +1,4 @@
+* text=auto eol=lf
+
+# Binary fixtures must never be normalized.
+*.apk binary
