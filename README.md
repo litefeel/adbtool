@@ -7,7 +7,7 @@ A friendly android adb command-line tool
 
 
 ### Python Requirements
-* python 3.11+
+* python 3.13+
 * uv
 * Android SDK
 
@@ -57,6 +57,8 @@ sub commands:
 adbt adb -- devices
 adbt adb -d 1 -- shell
 adbt adb -d a -- shell pwd
+adbt adb -d 1 -d emulator-5554 -- shell
+adbt adb -d 1,emulator-5554 -- shell
 adbt adb -- -H localhost devices
 adbt adb -d 1 -- -d shell
 ~~~
@@ -65,33 +67,33 @@ adbt adb -d 1 -- -d shell
 be placed after `--`.
 
 - `-d/--devices` before `--` belongs to `adbt adb`
+- repeat `-d/--devices` or separate selectors with commas to select multiple devices
 - everything after `--` is passed to the real `adb` binary without extra parsing
 - `adbt adb -h` shows the `adbt` subcommand help
 - `adbt adb -- -h` shows the real `adb` help
 
 ~~~
 adbt adb -h
-usage: adbt adb [-h] [-d [DEVICES ...]] -- [adb_args ...]
+usage: adbt adb [-h] [-d [DEVICE]] -- [adb_args ...]
 ~~~
 
 ---
 
 ~~~
 adbt devices -h
-usage: adbt [options] devices [-h] [-d DEVICES [DEVICES ...]] [-l]
+usage: adbt [options] devices [-h] [-d DEVICE] [-l]
 
 optional arguments:
   -h, --help            show this help message and exit
-  -d DEVICES [DEVICES ...], --devices DEVICES [DEVICES ...]
-                        filter of devices, [n | serial | a] n:index of list(start with 1), serial:at least 2 char,
-                        a:all
+  -d DEVICE, --devices DEVICE
+                        filter of devices, [n | serial | a]; repeat the option or separate values with commas
   -l, --list            show devices list
 ~~~
 ---
 ~~~
 adbt push -h
 usage: adbt [options] push [-h] [-r] [-n] [-j [HASHJSON]] [--hash [{sha1,mtime}]] [--localdir LOCALDIR]
-                           [--remotedir REMOTEDIR] [--dontpush] [-d [DEVICES [DEVICES ...]]]
+                           [--remotedir REMOTEDIR] [--dontpush] [-d [DEVICE]]
                            [path [path ...]]
 
 positional arguments:
@@ -108,14 +110,15 @@ optional arguments:
   --remotedir REMOTEDIR
                         local prefix and remote prefix, will replace local prefix to remote prefix
   --dontpush            only outout json file, not really push file to remote
-  -d [DEVICES [DEVICES ...]], --devices [DEVICES [DEVICES ...]]
+  -d, --devices [DEVICE]
                         filter of devices, [a | n | serial] a: all devices n: index of devices list(start with 1)
-                        serial: devices serial (at least 2 char) not argument is show device list
+                        serial: devices serial (at least 2 char); repeat the option or separate values with commas;
+                        not argument is show device list
 ~~~
 ---
 ~~~
 adbt install -h
-usage: adbt [options] install [-h] [-f] [--filter [FILTER ...]] [-r] [-d [DEVICES [DEVICES ...]]] [apkpath ...]
+usage: adbt [options] install [-h] [-f] [--filter FILTER] [-r] [-d [DEVICE]] [apkpath ...]
 
 positional arguments:
   apkpath
@@ -123,20 +126,28 @@ positional arguments:
 optional arguments:
   -h, --help            show this help message and exit
   -f, --force           install with adb -d -r
-  --filter [FILTER [FILTER ...]]
-                        filtered by file name
+  --filter FILTER       filter by file name; repeat the option or separate values with commas
   -r, --run             run app after install
-  -d [DEVICES [DEVICES ...]], --devices [DEVICES [DEVICES ...]]
+  -d, --devices [DEVICE]
                         filter of devices, [a | n | serial] a: all devices n: index of devices list(start with 1)
-                        serial: devices serial (at least 2 char) not argument is show device list
+                        serial: devices serial (at least 2 char); repeat the option or separate values with commas;
+                        not argument is show device list
 ~~~
 
 - `install` accepts multiple apk paths and uses `adb install-multi-package` when more than one apk is provided.
 - default install mode uses `adb -r`; `-f/--force` upgrades it to `adb -d -r`.
+- repeat `--filter` or separate filter values with commas when all terms must match.
+
+~~~powershell
+adbt install -d a C:\path\app.apk
+adbt install -d 1 -d emulator-5554 C:\path\app.apk
+adbt install --filter ZGame,arm64 --filter gp C:\path\builds
+~~~
+
 ---
 ~~~
 adbt apk -h
-usage: adbt [options] apk [-h] [-r] [-d [DEVICES [DEVICES ...]]] [apkpath]
+usage: adbt [options] apk [-h] [-r] [-d [DEVICE]] [apkpath]
 
 positional arguments:
   apkpath
@@ -144,7 +155,8 @@ positional arguments:
 optional arguments:
   -h, --help            show this help message and exit
   -r, --run             run app
-  -d [DEVICES [DEVICES ...]], --devices [DEVICES [DEVICES ...]]
+  -d, --devices [DEVICE]
                         filter of devices, [a | n | serial] a: all devices n: index of devices list(start with 1)
-                        serial: devices serial (at least 2 char) not argument is show device list
+                        serial: devices serial (at least 2 char); repeat the option or separate values with commas;
+                        not argument is show device list
 ~~~

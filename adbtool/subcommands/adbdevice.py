@@ -1,5 +1,6 @@
 import argparse
 
+from ..argparse_utils import CommaSeparatedAppendAction
 from ..cmd import call, getAdb
 from ..config import Config
 
@@ -120,11 +121,14 @@ def addArgumentParser(parser):
     parser.add_argument(
         "-d",
         "--devices",
-        nargs="*",
+        action=CommaSeparatedAppendAction,
+        nargs="?",
+        metavar="DEVICE",
         help="""filter of devices, [a | n | serial]
             a: all devices
             n: index of devices list(start with 1)
             serial: devices serial (at least 2 char)
+            repeat the option or separate values with commas
             not argument is show device list""",
     )
 
@@ -161,7 +165,10 @@ def addcommand(parser: argparse.ArgumentParser) -> None:
     parser.add_argument(
         "-d",
         "--devices",
-        nargs="+",
-        help="filter of devices, [n | serial | a] n:index of list(start with 1), serial:at least 2 char, a:all",
+        action=CommaSeparatedAppendAction,
+        metavar="DEVICE",
+        help="""filter of devices, [n | serial | a]
+            n:index of list(start with 1), serial:at least 2 char, a:all
+            repeat the option or separate values with commas""",
     )
     parser.add_argument("-l", "--list", action="store_true", help="show devices list")
