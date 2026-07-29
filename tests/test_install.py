@@ -69,8 +69,45 @@ def test_install_help_shows_force_and_filter(capsys):
     assert exc.value.code == 0
     out = capsys.readouterr().out
     assert "-f, --force" in out
-    assert "--filter [FILTER ...]" in out
+    assert "--filter FILTER" in out
+    assert "-d, --devices [DEVICE]" in out
     assert "[apkpath ...]" in out
+
+
+def test_install_repeatable_comma_separated_devices_do_not_consume_apk(monkeypatch):
+    calls = _mock_install(monkeypatch)
+    parsed_devices = []
+
+    def fake_do_argument_parser(args):
+        parsed_devices.append(args.devices)
+        return ["serial-1"], [object()]
+
+    monkeypatch.setattr(apkinstall.adbdevice, "doArgumentParser", fake_do_argument_parser)
+    _mock_fs(monkeypatch)
+    apk = os.path.join(os.getcwd(), "app.apk")
+
+    adbtool.main(["install", "-d", "1,emulator-5554", "-d", "2", apk])
+
+    assert parsed_devices == [["1", "emulator-5554", "2"]]
+    assert calls == [(["adb-bin", "-s", "serial-1", "install", "-r", apk], True)]
+
+
+def test_install_filter_supports_repeated_options_and_commas(monkeypatch):
+    calls = _mock_install(monkeypatch)
+    _mock_devices(monkeypatch, ["serial-1"])
+    parsed_filters = []
+    apk = os.path.join(os.getcwd(), "app.apk")
+
+    def fake_filter_apks(path, filters):
+        parsed_filters.append(filters)
+        return [path]
+
+    monkeypatch.setattr(apkinstall, "filterApks", fake_filter_apks)
+
+    adbtool.main(["install", "--filter", "ZGame,arm64", "--filter", "gp", apk])
+
+    assert parsed_filters == [["ZGame", "arm64", "gp"]]
+    assert calls == [(["adb-bin", "-s", "serial-1", "install", "-r", apk], True)]
 
 
 def test_install_single_apk_uses_install_r(monkeypatch):

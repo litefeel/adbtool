@@ -2,6 +2,7 @@ import argparse
 import os
 import tempfile
 
+from ..argparse_utils import CommaSeparatedAppendAction
 from ..cmd import call, getApksigner, getZipalign
 from ..config import Config
 from . import adbdevice
@@ -87,7 +88,13 @@ def docommand(args: argparse.Namespace, cfg: Config) -> None:
 
 
 def addcommand(parser: argparse.ArgumentParser) -> None:
-    parser.add_argument("-f", "--filter", nargs="*", help="filtered by file name")
+    parser.add_argument(
+        "-f",
+        "--filter",
+        action=CommaSeparatedAppendAction,
+        metavar="FILTER",
+        help="filter by file name; repeat the option or separate values with commas",
+    )
     parser.add_argument("--ks")
     parser.add_argument("--ks-pass", dest="ks_pass")
     parser.add_argument("--ks-key-alias", dest="ks_key_alias")
