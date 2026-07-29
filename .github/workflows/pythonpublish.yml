@@ -24,7 +24,7 @@ jobs:
       uses: astral-sh/setup-uv@v8.2.0
       with:
         enable-cache: true
-        python-version: '3.11'
+        python-version: '3.13'
     - name: Install dependencies and build
       run: uv build
     - name: Publish package distributions to PyPI

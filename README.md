@@ -7,7 +7,7 @@ A friendly android adb command-line tool
 
 
 ### Python Requirements
-* python 3.11+
+* python 3.13+
 * uv
 * Android SDK
 
