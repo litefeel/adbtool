@@ -81,7 +81,7 @@ def main(_args: list[str] | None = None) -> None:
         Command("devices", adbdevice, "show android device list"),
         Command("push", adbpush, "push files to android device"),
         Command("pull", adbpull, "pull files to android device"),
-        Command("install", apkinstall, "install apk file"),
+        Command("install", apkinstall, "install apk or xapk file"),
         Command("uninstall", apkuninstall, "uninstall apk file"),
         Command("apk", apkinfo, "show apk packageName/activityName"),
         Command("sign", apksigner, "sign apk with android debug(only windows)"),

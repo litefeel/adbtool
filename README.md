@@ -43,7 +43,7 @@ sub commands:
     adb                 forward adb arguments to selected devices
     devices             show android device list
     push                push files to android device
-    install             install apk file
+    install             install apk or xapk file
     uninstall           uninstall apk file
     apk                 show apk packageName/activityName
     sign                sign apk with android debug(only windows)
@@ -121,7 +121,7 @@ adbt install -h
 usage: adbt [options] install [-h] [-f] [--filter FILTER] [-r] [-d [DEVICE]] [apkpath ...]
 
 positional arguments:
-  apkpath
+  apkpath               apk/xapk file or directory
 
 optional arguments:
   -h, --help            show this help message and exit
@@ -134,12 +134,15 @@ optional arguments:
                         not argument is show device list
 ~~~
 
-- `install` accepts multiple apk paths and uses `adb install-multi-package` when more than one apk is provided.
+- `install` accepts APK and XAPK files. A directory selects the newest matching `.apk` or `.xapk` file.
+- multiple APK paths use `adb install-multi-package`; an XAPK must be installed by itself.
+- XAPK split APKs use `adb install-multiple`; declared OBB files are pushed to `/sdcard/Android/obb/<package>/` after installation.
 - default install mode uses `adb -r`; `-f/--force` upgrades it to `adb -d -r`.
 - repeat `--filter` or separate filter values with commas when all terms must match.
 
 ~~~powershell
 adbt install -d a C:\path\app.apk
+adbt install -d a C:\path\game.xapk
 adbt install -d 1 -d emulator-5554 C:\path\app.apk
 adbt install --filter ZGame,arm64 --filter gp C:\path\builds
 ~~~
