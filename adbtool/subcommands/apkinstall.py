@@ -11,9 +11,9 @@ from dataclasses import dataclass
 from pathlib import PurePosixPath, PureWindowsPath
 
 from ..argparse_utils import CommaSeparatedAppendAction
-from ..cmd import call_argv, getAdb
+from ..cmd import call_argv, getAdb, getHdc
 from ..config import Config
-from . import adbdevice, apkinfo
+from . import adbdevice, apkinfo, hdcdevice
 
 # BASE_DIR="F:/release"
 BASE_DIR = ""
@@ -35,7 +35,9 @@ class _XapkPackage:
 
 def getApks(path, filters):
     apks = [
-        filename for filename in os.listdir(path) if filename.lower().endswith((".apk", ".xapk"))
+        filename
+        for filename in os.listdir(path)
+        if filename.lower().endswith((".apk", ".xapk", ".hap"))
     ]
     if filters is not None:
 
@@ -60,7 +62,7 @@ def filterApks(fileorpath: str, filters) -> list[str]:
     if os.path.isdir(fileorpath):
         apks = getApks(fileorpath, filters)
         if len(apks) == 0:
-            print("can not found apk or xapk file in %s " % fileorpath)
+            print("can not found apk, xapk, or hap file in %s " % fileorpath)
             exit(1)
         return [getNewst(apks)]
     return [fileorpath]
@@ -229,6 +231,19 @@ def install(apks: list[str], serials: list[str], run: bool, force: bool) -> None
                 apkinfo.run(target_apk, [serial])
 
 
+def install_haps(haps: list[str], serials: list[str], hdc: str, force: bool) -> None:
+    install_args = ["-d", "-r"] if force else ["-r"]
+
+    def install_one(serial: str) -> int:
+        _, code = call_argv([hdc, "-t", serial, "install", *install_args, *haps], printOutput=True)
+        return code
+
+    with ThreadPoolExecutor(max_workers=len(serials)) as executor:
+        futures: list[Future[int]] = [executor.submit(install_one, serial) for serial in serials]
+        for future in futures:
+            print(future.result() == 0)
+
+
 def _install_xapk(package: _XapkPackage, serials: list[str], run: bool, force: bool) -> None:
     adb = getAdb()
     subcommand = "install-multiple" if len(package.apks) > 1 else "install"
@@ -265,10 +280,6 @@ def _install_xapk(package: _XapkPackage, serials: list[str], run: bool, force: b
 
 
 def docommand(args: argparse.Namespace, cfg: Config) -> None:
-    serials, devices = adbdevice.doArgumentParser(args)
-    if not serials:
-        exit(0)
-
     paths = args.apkpath or [cfg.install.apkpath or "."]
     paths = [os.path.abspath(os.path.join(BASE_DIR, path)) for path in paths]
 
@@ -276,10 +287,28 @@ def docommand(args: argparse.Namespace, cfg: Config) -> None:
     for path in paths:
         apks.extend(filterApks(path, args.filter))
 
-    if serials is None or not apks:
+    if not apks:
         return
 
     xapks = [path for path in apks if path.lower().endswith(".xapk")]
+    haps = [path for path in apks if path.lower().endswith(".hap")]
+    if haps:
+        if len(haps) != len(apks):
+            raise SystemExit("hap files can not be installed with apk or xapk files")
+        if args.run or cfg.install.run:
+            raise SystemExit("--run is not supported for hap files")
+
+        hdc = getHdc(cfg.hdc)
+        serials, _ = hdcdevice.doArgumentParser(args, hdc)
+        if not serials:
+            return
+        install_haps(haps, serials, hdc, args.force)
+        return
+
+    serials, _ = adbdevice.doArgumentParser(args)
+    if not serials:
+        return
+
     if xapks:
         if len(apks) != 1:
             raise SystemExit("an xapk file must be installed by itself")
@@ -292,7 +321,9 @@ def docommand(args: argparse.Namespace, cfg: Config) -> None:
 
 
 def addcommand(parser: argparse.ArgumentParser) -> None:
-    parser.add_argument("-f", "--force", action="store_true", help="install with adb -d -r")
+    parser.add_argument(
+        "-f", "--force", action="store_true", help="allow downgrade and replace existing app"
+    )
     parser.add_argument(
         "--filter",
         action=CommaSeparatedAppendAction,
@@ -300,5 +331,5 @@ def addcommand(parser: argparse.ArgumentParser) -> None:
         help="filter by file name; repeat the option or separate values with commas",
     )
     parser.add_argument("-r", "--run", action="store_true", help="run app after install")
-    parser.add_argument("apkpath", nargs="*", help="apk/xapk file or directory")
+    parser.add_argument("apkpath", nargs="*", help="apk/xapk/hap file or directory")
     adbdevice.addArgumentParser(parser)

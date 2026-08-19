@@ -36,6 +36,26 @@ def _mock_install(monkeypatch, returncodes=None):
     return calls
 
 
+def _mock_hap_install(monkeypatch, serials=None, returncodes=None):
+    calls = []
+    selected_serials = ["hdc-serial-1"] if serials is None else list(serials)
+    codes = [0] if returncodes is None else list(returncodes)
+
+    monkeypatch.setattr(apkinstall, "getHdc", lambda hdc_dir=None: "hdc-bin")
+    monkeypatch.setattr(
+        apkinstall.hdcdevice,
+        "doArgumentParser",
+        lambda args, hdc: (selected_serials, [object() for _ in selected_serials]),
+    )
+
+    def fake_call_argv(args, printOutput=False):
+        calls.append((list(args), printOutput))
+        return "", codes.pop(0) if codes else 0
+
+    monkeypatch.setattr(apkinstall, "call_argv", fake_call_argv)
+    return calls
+
+
 def _mock_devices(monkeypatch, serials, devices=None):
     actual_devices = [object() for _ in serials] if devices is None else devices
 
@@ -304,6 +324,150 @@ def test_install_directory_selects_newest_apk_or_xapk(tmp_path):
     os.utime(ignored, (300, 300))
 
     assert apkinstall.filterApks(str(tmp_path), ["matching"]) == [str(xapk)]
+
+
+def test_install_directory_selects_newest_hap(tmp_path):
+    apk = tmp_path / "matching-old.apk"
+    hap = tmp_path / "matching-new.hap"
+    apk.write_bytes(b"apk")
+    hap.write_bytes(b"hap")
+    os.utime(apk, (100, 100))
+    os.utime(hap, (200, 200))
+
+    assert apkinstall.filterApks(str(tmp_path), ["matching"]) == [str(hap)]
+
+
+def test_install_single_hap_uses_hdc(monkeypatch):
+    calls = _mock_hap_install(monkeypatch)
+    _mock_fs(monkeypatch)
+    hap = os.path.join(os.getcwd(), "app.hap")
+
+    adbtool.main(["install", hap])
+
+    assert calls == [(["hdc-bin", "-t", "hdc-serial-1", "install", "-r", hap], True)]
+
+
+def test_install_multiple_haps_with_force(monkeypatch):
+    calls = _mock_hap_install(monkeypatch)
+    _mock_fs(monkeypatch)
+    entry = os.path.join(os.getcwd(), "entry.hap")
+    feature = os.path.join(os.getcwd(), "feature.hap")
+
+    adbtool.main(["install", "--force", entry, feature])
+
+    assert calls == [
+        (
+            [
+                "hdc-bin",
+                "-t",
+                "hdc-serial-1",
+                "install",
+                "-d",
+                "-r",
+                entry,
+                feature,
+            ],
+            True,
+        )
+    ]
+
+
+def test_install_hap_uses_configured_hdc_directory(monkeypatch, tmp_path):
+    seen_hdc_dirs = []
+    calls = []
+    config_path = tmp_path / "config.yml"
+    config_path.write_text("hdc: D:\\Harmony\\toolchains\n", encoding="utf-8")
+    hap = tmp_path / "app.hap"
+
+    def fake_get_hdc(hdc_dir=None):
+        seen_hdc_dirs.append(hdc_dir)
+        return "configured-hdc"
+
+    monkeypatch.setattr(apkinstall, "getHdc", fake_get_hdc)
+    monkeypatch.setattr(
+        apkinstall.hdcdevice,
+        "doArgumentParser",
+        lambda args, hdc: (["hdc-serial-1"], [object()]),
+    )
+    monkeypatch.setattr(
+        apkinstall,
+        "call_argv",
+        lambda args, printOutput=False: (calls.append(list(args)) or "", 0),
+    )
+
+    adbtool.main(["-c", str(config_path), "install", str(hap)])
+
+    assert seen_hdc_dirs == [r"D:\Harmony\toolchains"]
+    assert calls == [["configured-hdc", "-t", "hdc-serial-1", "install", "-r", str(hap)]]
+
+
+def test_install_hap_run_is_rejected_before_hdc(monkeypatch):
+    monkeypatch.setattr(
+        apkinstall, "getHdc", lambda hdc_dir=None: pytest.fail("HDC should not be resolved")
+    )
+    _mock_fs(monkeypatch)
+    hap = os.path.join(os.getcwd(), "app.hap")
+
+    with pytest.raises(SystemExit, match="--run is not supported for hap files"):
+        adbtool.main(["install", "--run", hap])
+
+
+def test_install_rejects_mixed_hap_and_apk_before_device_lookup(monkeypatch):
+    monkeypatch.setattr(
+        apkinstall, "getHdc", lambda hdc_dir=None: pytest.fail("HDC should not be resolved")
+    )
+    monkeypatch.setattr(
+        apkinstall.adbdevice,
+        "doArgumentParser",
+        lambda args: pytest.fail("ADB devices should not be queried"),
+    )
+    _mock_fs(monkeypatch)
+    hap = os.path.join(os.getcwd(), "app.hap")
+    apk = os.path.join(os.getcwd(), "app.apk")
+
+    with pytest.raises(SystemExit, match="hap files can not be installed with apk"):
+        adbtool.main(["install", hap, apk])
+
+
+def test_install_hap_runs_multiple_serials_in_parallel(monkeypatch):
+    calls = []
+    entered = []
+    release = threading.Event()
+    both_started = threading.Event()
+    lock = threading.Lock()
+
+    monkeypatch.setattr(apkinstall, "getHdc", lambda hdc_dir=None: "hdc-bin")
+    monkeypatch.setattr(
+        apkinstall.hdcdevice,
+        "doArgumentParser",
+        lambda args, hdc: (["hdc-1", "hdc-2"], [object(), object()]),
+    )
+
+    def fake_call_argv(args, printOutput=False):
+        with lock:
+            calls.append((list(args), printOutput))
+            entered.append(args[2])
+            if len(entered) == 2:
+                both_started.set()
+        assert both_started.wait(1), "expected both installs to start before either completed"
+        assert release.wait(1), "timed out waiting to release parallel install"
+        return "", 0
+
+    monkeypatch.setattr(apkinstall, "call_argv", fake_call_argv)
+    _mock_fs(monkeypatch)
+    hap = os.path.join(os.getcwd(), "app.hap")
+
+    worker = threading.Thread(target=adbtool.main, args=(["install", hap],))
+    worker.start()
+    assert both_started.wait(1), "install did not dispatch both HDC targets concurrently"
+    release.set()
+    worker.join(1)
+
+    assert not worker.is_alive()
+    assert calls == [
+        (["hdc-bin", "-t", "hdc-1", "install", "-r", hap], True),
+        (["hdc-bin", "-t", "hdc-2", "install", "-r", hap], True),
+    ]
 
 
 def test_install_single_apk_xapk_uses_install_and_cleans_temp_files(monkeypatch, tmp_path):

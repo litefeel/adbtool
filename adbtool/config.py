@@ -114,6 +114,7 @@ class AssetBundleConfig:
 
 @dataclass(slots=True)
 class Config:
+    hdc: str | None = None
     push: PushConfig = field(default_factory=PushConfig)
     pull: PullConfig = field(default_factory=PullConfig)
     apk: ApkConfig = field(default_factory=ApkConfig)
@@ -124,6 +125,7 @@ class Config:
     groups: dict[str, "Config"] = field(default_factory=dict)
 
     def load(self, obj: ConfigSection) -> None:
+        self.hdc = get_value("hdc", obj, None)
         copy_subconfig("push", obj, self.push)
         copy_subconfig("pull", obj, self.pull)
         copy_subconfig("apk", obj, self.apk)

@@ -4,7 +4,10 @@ from adbtool import adbtool
 
 
 def test_config():
-    config.Config().load_config("tests/config.yml")
+    cfg = config.Config()
+    cfg.load_config("tests/config.yml")
+
+    assert cfg.hdc == r"C:\Program Files\Huawei\DevEco Studio\sdk\default\openharmony\toolchains"
 
 
 def test_default():

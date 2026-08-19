@@ -11,6 +11,11 @@ from semantic_version import Version
 from .errors import raise_error
 
 
+_DEFAULT_WINDOWS_HDC_DIR = (
+    r"C:\Program Files\Huawei\DevEco Studio\sdk\default\openharmony\toolchains"
+)
+
+
 # return (output, isOk)
 def call(cmd: str, printOutput: bool = False) -> tuple[str, bool]:
     # print(f"{printOutput = }, {cmd = }")
@@ -84,6 +89,19 @@ def getAdb() -> str:
         return "adb"
 
     return os.path.join(androidHome, "platform-tools/adb")
+
+
+def getHdc(hdc_dir: str | None = None) -> str:
+    executable = "hdc.exe" if sys.platform == "win32" else "hdc"
+    if hdc_dir:
+        return os.path.join(os.path.expanduser(hdc_dir), executable)
+
+    if sys.platform == "win32":
+        default_hdc = os.path.join(_DEFAULT_WINDOWS_HDC_DIR, executable)
+        if os.path.isfile(default_hdc):
+            return default_hdc
+
+    return "hdc"
 
 
 def getAapt() -> str:

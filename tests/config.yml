@@ -1,3 +1,4 @@
+hdc: C:\Program Files\Huawei\DevEco Studio\sdk\default\openharmony\toolchains
 
 push:
   localdir: .
@@ -12,4 +13,4 @@ apk:
 
 install:
   run: false
-  apkpath: 
+  apkpath:

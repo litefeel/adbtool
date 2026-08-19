@@ -9,7 +9,8 @@ A friendly android adb command-line tool
 ### Python Requirements
 * python 3.13+
 * uv
-* Android SDK
+* Android SDK (for APK/XAPK commands)
+* HarmonyOS/OpenHarmony SDK (for HAP installs)
 
 
 ### Development
@@ -43,7 +44,7 @@ sub commands:
     adb                 forward adb arguments to selected devices
     devices             show android device list
     push                push files to android device
-    install             install apk or xapk file
+    install             install apk, xapk, or hap file
     uninstall           uninstall apk file
     apk                 show apk packageName/activityName
     sign                sign apk with android debug(only windows)
@@ -121,11 +122,11 @@ adbt install -h
 usage: adbt [options] install [-h] [-f] [--filter FILTER] [-r] [-d [DEVICE]] [apkpath ...]
 
 positional arguments:
-  apkpath               apk/xapk file or directory
+  apkpath               apk/xapk/hap file or directory
 
 optional arguments:
   -h, --help            show this help message and exit
-  -f, --force           install with adb -d -r
+  -f, --force           allow downgrade and replace existing app
   --filter FILTER       filter by file name; repeat the option or separate values with commas
   -r, --run             run app after install
   -d, --devices [DEVICE]
@@ -134,15 +135,24 @@ optional arguments:
                         not argument is show device list
 ~~~
 
-- `install` accepts APK and XAPK files. A directory selects the newest matching `.apk` or `.xapk` file.
+- `install` accepts APK, XAPK, and HAP files. A directory selects the newest matching package.
 - multiple APK paths use `adb install-multi-package`; an XAPK must be installed by itself.
 - XAPK split APKs use `adb install-multiple`; declared OBB files are pushed to `/sdcard/Android/obb/<package>/` after installation.
 - default install mode uses `adb -r`; `-f/--force` upgrades it to `adb -d -r`.
+- HAP files use `hdc -t <device> install -r`; `-f/--force` upgrades it to `-d -r`.
+- multiple HAP paths are installed together; HAP cannot be mixed with APK/XAPK, and `--run` is not supported for HAP.
+- configure the HDC tool directory with the top-level `hdc` key in `adbtool.yml`. On Windows, the DevEco Studio default is checked before PATH:
+
+~~~yaml
+hdc: C:\Program Files\Huawei\DevEco Studio\sdk\default\openharmony\toolchains
+~~~
+
 - repeat `--filter` or separate filter values with commas when all terms must match.
 
 ~~~powershell
 adbt install -d a C:\path\app.apk
 adbt install -d a C:\path\game.xapk
+adbt install -d a C:\path\app.hap
 adbt install -d 1 -d emulator-5554 C:\path\app.apk
 adbt install --filter ZGame,arm64 --filter gp C:\path\builds
 ~~~
