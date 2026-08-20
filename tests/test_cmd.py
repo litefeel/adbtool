@@ -95,20 +95,18 @@ def _mock_devices(monkeypatch, serials, devices=None):
 
 def test_adb_passthrough_devices_requires_double_dash(monkeypatch):
     calls = _mock_adb(monkeypatch)
-    _mock_devices(monkeypatch, ["serial-1"])
 
     adbtool.main(["adb", "--", "devices"])
 
-    assert calls == [(["adb-bin", "-s", "serial-1", "devices"], True)]
+    assert calls == [(["adb-bin", "devices"], True)]
 
 
 def test_adb_passthrough_option_like_args(monkeypatch):
     calls = _mock_adb(monkeypatch)
-    _mock_devices(monkeypatch, ["serial-1"])
 
     adbtool.main(["adb", "--", "-H", "localhost", "devices"])
 
-    assert calls == [(["adb-bin", "-s", "serial-1", "-H", "localhost", "devices"], True)]
+    assert calls == [(["adb-bin", "-H", "localhost", "devices"], True)]
 
 
 def test_adb_passthrough_with_device_filter(monkeypatch):
@@ -134,11 +132,10 @@ def test_adb_passthrough_multiple_devices(monkeypatch):
 
 def test_adb_passthrough_allows_native_adb_dash_d(monkeypatch):
     calls = _mock_adb(monkeypatch)
-    _mock_devices(monkeypatch, ["serial-1"])
 
     adbtool.main(["adb", "--", "-d", "shell"])
 
-    assert calls == [(["adb-bin", "-s", "serial-1", "-d", "shell"], True)]
+    assert calls == [(["adb-bin", "-d", "shell"], True)]
 
 
 def test_adb_passthrough_with_global_config(monkeypatch):
@@ -162,11 +159,10 @@ def test_adb_passthrough_help_uses_subcommand_help(monkeypatch):
 
 def test_adb_passthrough_adb_help(monkeypatch):
     calls = _mock_adb(monkeypatch)
-    _mock_devices(monkeypatch, ["serial-1"])
 
     adbtool.main(["adb", "--", "-h"])
 
-    assert calls == [(["adb-bin", "-s", "serial-1", "-h"], True)]
+    assert calls == [(["adb-bin", "-h"], True)]
 
 
 def test_adb_without_passthrough_args_shows_help(monkeypatch):
@@ -179,13 +175,17 @@ def test_adb_without_passthrough_args_shows_help(monkeypatch):
     assert calls == []
 
 
-def test_adb_with_empty_passthrough_runs_bare_adb_for_selected_device(monkeypatch):
+def test_adb_with_empty_passthrough_runs_bare_adb_without_device_selection(monkeypatch):
     calls = _mock_adb(monkeypatch)
-    _mock_devices(monkeypatch, ["serial-1"])
+    monkeypatch.setattr(
+        adbcommand.adbdevice,
+        "doArgumentParser",
+        lambda args: pytest.fail("device selection must not run without -d"),
+    )
 
     adbtool.main(["adb", "--"])
 
-    assert calls == [(["adb-bin", "-s", "serial-1"], True)]
+    assert calls == [(["adb-bin"], True)]
 
 
 def test_adb_with_devices_flag_and_no_values_only_lists_devices(monkeypatch):
@@ -197,18 +197,21 @@ def test_adb_with_devices_flag_and_no_values_only_lists_devices(monkeypatch):
     assert calls == []
 
 
-def test_adb_without_device_selection_does_not_run_for_multiple_devices(monkeypatch):
+def test_adb_without_device_option_does_not_query_devices(monkeypatch):
     calls = _mock_adb(monkeypatch)
-    _mock_devices(monkeypatch, ["serial-1", "serial-2"], devices=[object(), object()])
+    monkeypatch.setattr(
+        adbcommand.adbdevice,
+        "doArgumentParser",
+        lambda args: pytest.fail("device selection must not run without -d"),
+    )
 
     adbtool.main(["adb", "--", "devices"])
 
-    assert calls == []
+    assert calls == [(["adb-bin", "devices"], True)]
 
 
 def test_adb_passthrough_exit_code(monkeypatch):
     _mock_adb(monkeypatch, returncodes=[17])
-    _mock_devices(monkeypatch, ["serial-1"])
 
     with pytest.raises(SystemExit) as exc:
         adbtool.main(["adb", "--", "devices"])

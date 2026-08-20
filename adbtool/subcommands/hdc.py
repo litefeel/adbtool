@@ -7,11 +7,15 @@ from . import hdcdevice
 
 def docommand(args: argparse.Namespace, cfg: Config) -> None:
     hdc = getHdc(cfg.hdc)
-    serials, devices = hdcdevice.doArgumentParser(args, hdc)
-    if args.devices == [] or not serials:
+
+    if args.devices is None:
+        _, returncode = call_argv([hdc, *args.hdc_args], printOutput=True)
+        if returncode != 0:
+            raise SystemExit(returncode)
         return
 
-    if args.devices is None and len(devices) != 1:
+    serials, _ = hdcdevice.doArgumentParser(args, hdc)
+    if args.devices == [] or not serials:
         return
 
     last_returncode = 0

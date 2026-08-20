@@ -65,10 +65,11 @@ adbt adb -- -H localhost devices
 adbt adb -d 1 -- -d shell
 ~~~
 
-`adbt adb` supports the same device selection flow as `install`, and adb arguments must
-be placed after `--`.
+`adbt adb` forwards directly to native adb by default. Device selection is only performed
+when `-d/--devices` is explicitly supplied, and adb arguments must be placed after `--`.
 
 - `-d/--devices` before `--` belongs to `adbt adb`
+- without `-d/--devices`, the command runs once without adding `adb -s <serial>`
 - repeat `-d/--devices` or separate selectors with commas to select multiple devices
 - everything after `--` is passed to the real `adb` binary without extra parsing
 - `adbt adb -h` shows the `adbt` subcommand help
@@ -90,13 +91,14 @@ adbt hdc -d 1,serial-prefix -- shell
 adbt hdc -- -h
 ~~~
 
-`adbt hdc` uses the HDC target list and follows the same selection and argument
-forwarding rules as `adbt adb`.
+`adbt hdc` follows the same opt-in device selection and argument forwarding rules as
+`adbt adb`.
 
 - `-d/--devices` before `--` selects HDC targets by index, serial prefix, or `a`
+- without `-d/--devices`, the command runs once without adding `hdc -t <serial>`
 - repeat `-d/--devices` or separate selectors with commas to select multiple targets
 - everything after `--` is passed to the real `hdc` binary without extra parsing
-- each selected target is invoked as `hdc -t <serial> ...`
+- each explicitly selected target is invoked as `hdc -t <serial> ...`
 - `adbt hdc -h` shows the `adbt` subcommand help
 - `adbt hdc -- -h` shows the real `hdc` help
 - the HDC tool directory uses the top-level `hdc` setting in `adbtool.yml`
