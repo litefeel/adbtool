@@ -17,6 +17,7 @@ from .subcommands import (
     apkuninstall,
     assetbundleinfo,
     asshader,
+    hdc,
     il2cpp,
     malioc,
     pagesize,
@@ -78,6 +79,7 @@ def main(_args: list[str] | None = None) -> None:
 
     commands = [
         Command("adb", adb, "forward adb arguments to selected devices"),
+        Command("hdc", hdc, "forward hdc arguments to selected devices"),
         Command("devices", adbdevice, "show android device list"),
         Command("push", adbpush, "push files to android device"),
         Command("pull", adbpull, "pull files to android device"),
@@ -119,18 +121,20 @@ def main(_args: list[str] | None = None) -> None:
         if cfg is None:
             parser.error(f"can not find group: {args.group}")
 
-    if args.subcommand == "adb":
+    if args.subcommand in ("adb", "hdc"):
+        passthrough_command = args.subcommand
+        passthrough_dest = f"{passthrough_command}_args"
         if extra:
             if extra[0] != "--":
-                parser.error("adb arguments must follow '--'")
-            args.adb_args = extra[1:]
+                parser.error(f"{passthrough_command} arguments must follow '--'")
+            setattr(args, passthrough_dest, extra[1:])
         elif args.devices == []:
-            args.adb_args = []
+            setattr(args, passthrough_dest, [])
         elif args.devices is None:
-            command_parsers["adb"].print_help()
+            command_parsers[passthrough_command].print_help()
             sys.exit(0)
         else:
-            parser.error("adb arguments must follow '--'")
+            parser.error(f"{passthrough_command} arguments must follow '--'")
     elif extra:
         parser.error(f"unrecognized arguments: {' '.join(extra)}")
 
