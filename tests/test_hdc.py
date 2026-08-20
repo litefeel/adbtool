@@ -164,7 +164,7 @@ def test_hdc_passthrough_arguments(monkeypatch):
 
     adbtool.main(["hdc", "--", "shell", "pwd"])
 
-    assert calls == [(["hdc-bin", "-t", "serial-1", "shell", "pwd"], True)]
+    assert calls == [(["hdc-bin", "shell", "pwd"], True)]
 
 
 def test_hdc_passthrough_option_like_arguments(monkeypatch):
@@ -172,7 +172,38 @@ def test_hdc_passthrough_option_like_arguments(monkeypatch):
 
     adbtool.main(["hdc", "--", "-l", "5", "shell"])
 
-    assert calls == [(["hdc-bin", "-t", "serial-1", "-l", "5", "shell"], True)]
+    assert calls == [(["hdc-bin", "-l", "5", "shell"], True)]
+
+
+def test_hdc_target_list_runs_without_device_selection(monkeypatch):
+    calls = []
+
+    monkeypatch.setattr(hdccommand, "getHdc", lambda hdc_dir=None: "hdc-bin")
+    monkeypatch.setattr(
+        hdccommand.hdcdevice,
+        "doArgumentParser",
+        lambda args, hdc: pytest.fail("target listing must not select devices"),
+    )
+
+    def fake_call_argv(args, printOutput=False):
+        calls.append((list(args), printOutput))
+        return "", 0
+
+    monkeypatch.setattr(hdccommand, "call_argv", fake_call_argv)
+
+    adbtool.main(["hdc", "--", "list", "targets", "-v"])
+
+    assert calls == [(["hdc-bin", "list", "targets", "-v"], True)]
+
+
+def test_hdc_target_list_exit_code(monkeypatch):
+    monkeypatch.setattr(hdccommand, "getHdc", lambda hdc_dir=None: "hdc-bin")
+    monkeypatch.setattr(hdccommand, "call_argv", lambda args, printOutput=False: ("", 23))
+
+    with pytest.raises(SystemExit) as exc:
+        adbtool.main(["hdc", "--", "LIST", "TARGETS", "-v"])
+
+    assert exc.value.code == 23
 
 
 def test_hdc_passthrough_with_device_selectors(monkeypatch):
@@ -198,7 +229,7 @@ def test_hdc_passthrough_uses_configured_hdc_directory(monkeypatch, tmp_path):
     adbtool.main(["-c", str(config_path), "hdc", "--", "shell"])
 
     assert hdc_dirs == [r"D:\Harmony\toolchains"]
-    assert calls == [(["hdc-bin", "-t", "serial-1", "shell"], True)]
+    assert calls == [(["hdc-bin", "shell"], True)]
 
 
 def test_hdc_passthrough_help_uses_subcommand_help(monkeypatch):
@@ -217,7 +248,7 @@ def test_hdc_passthrough_native_help(monkeypatch):
 
     adbtool.main(["hdc", "--", "-h"])
 
-    assert calls == [(["hdc-bin", "-t", "serial-1", "-h"], True)]
+    assert calls == [(["hdc-bin", "-h"], True)]
 
 
 def test_hdc_without_passthrough_args_shows_help(monkeypatch):
@@ -231,12 +262,13 @@ def test_hdc_without_passthrough_args_shows_help(monkeypatch):
     assert hdc_dirs == []
 
 
-def test_hdc_with_empty_passthrough_runs_bare_hdc_for_selected_device(monkeypatch):
-    calls, _, _ = _mock_hdc_command(monkeypatch)
+def test_hdc_with_empty_passthrough_runs_bare_hdc_without_device_selection(monkeypatch):
+    calls, _, selectors = _mock_hdc_command(monkeypatch)
 
     adbtool.main(["hdc", "--"])
 
-    assert calls == [(["hdc-bin", "-t", "serial-1"], True)]
+    assert selectors == []
+    assert calls == [(["hdc-bin"], True)]
 
 
 def test_hdc_with_devices_flag_and_no_values_only_lists_devices(monkeypatch):
@@ -248,15 +280,16 @@ def test_hdc_with_devices_flag_and_no_values_only_lists_devices(monkeypatch):
     assert calls == []
 
 
-def test_hdc_without_device_selection_does_not_run_for_multiple_devices(monkeypatch):
-    calls, _, _ = _mock_hdc_command(
+def test_hdc_without_device_option_does_not_query_devices(monkeypatch):
+    calls, _, selectors = _mock_hdc_command(
         monkeypatch,
         serials=["serial-1", "serial-2"],
     )
 
     adbtool.main(["hdc", "--", "shell"])
 
-    assert calls == []
+    assert selectors == []
+    assert calls == [(["hdc-bin", "shell"], True)]
 
 
 def test_hdc_passthrough_exit_code(monkeypatch):
