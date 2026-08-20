@@ -14,6 +14,23 @@ from .errors import raise_error
 _DEFAULT_WINDOWS_HDC_DIR = (
     r"C:\Program Files\Huawei\DevEco Studio\sdk\default\openharmony\toolchains"
 )
+_ANDROID_SDK_ENV_VARS = ("ANDROID_HOME", "ANDROID_SDK", "ANDROID_SDK_ROOT")
+
+
+def _get_android_home() -> str | None:
+    for env_var in _ANDROID_SDK_ENV_VARS:
+        android_home = os.getenv(env_var)
+        if android_home is not None:
+            return android_home
+
+    if sys.platform == "win32":
+        local_app_data = os.getenv("LOCALAPPDATA")
+        if local_app_data:
+            default_android_home = os.path.join(local_app_data, "Android", "Sdk")
+            if os.path.isdir(default_android_home):
+                return default_android_home
+
+    return None
 
 
 # return (output, isOk)
@@ -79,11 +96,7 @@ async def call_async(cmd: str, printOutput: bool = False) -> tuple[str, bool]:
 
 
 def getAdb() -> str:
-    androidHome = os.getenv("ANDROID_HOME")
-    if androidHome is None:
-        androidHome = os.getenv("ANDROID_SDK")
-    if androidHome is None:
-        androidHome = os.getenv("ANDROID_SDK_ROOT")
+    androidHome = _get_android_home()
     if androidHome is None:
         # print('can not found ANDROID_HOME/ANDROID_SDK in environment value')
         return "adb"
@@ -105,11 +118,7 @@ def getHdc(hdc_dir: str | None = None) -> str:
 
 
 def getAapt() -> str:
-    androidHome = os.getenv("ANDROID_HOME")
-    if androidHome is None:
-        androidHome = os.getenv("ANDROID_SDK")
-    if androidHome is None:
-        androidHome = os.getenv("ANDROID_SDK_ROOT")
+    androidHome = _get_android_home()
     if androidHome is None:
         print("can not found ANDROID_HOME/ANDROID_SDK in environment value")
         return "aapt"
@@ -129,11 +138,7 @@ def getAapt() -> str:
 
 
 def getZipalign() -> str:
-    androidHome = os.getenv("ANDROID_HOME")
-    if androidHome is None:
-        androidHome = os.getenv("ANDROID_SDK")
-    if androidHome is None:
-        androidHome = os.getenv("ANDROID_SDK_ROOT")
+    androidHome = _get_android_home()
     if androidHome is None:
         print("can not found ANDROID_HOME/ANDROID_SDK in environment value")
         return "zipalign"
@@ -154,11 +159,7 @@ def getZipalign() -> str:
 
 
 def getApksigner() -> str:
-    androidHome = os.getenv("ANDROID_HOME")
-    if androidHome is None:
-        androidHome = os.getenv("ANDROID_SDK")
-    if androidHome is None:
-        androidHome = os.getenv("ANDROID_SDK_ROOT")
+    androidHome = _get_android_home()
     if androidHome is None:
         print("can not found ANDROID_HOME/ANDROID_SDK in environment value")
         return "apksigner"
@@ -179,11 +180,7 @@ def getApksigner() -> str:
 
 
 def get_objdump() -> str:
-    androidHome = os.getenv("ANDROID_HOME")
-    if androidHome is None:
-        androidHome = os.getenv("ANDROID_SDK")
-    if androidHome is None:
-        androidHome = os.getenv("ANDROID_SDK_ROOT")
+    androidHome = _get_android_home()
     if androidHome is None:
         print("can not found ANDROID_HOME/ANDROID_SDK in environment value")
         return "objdump"

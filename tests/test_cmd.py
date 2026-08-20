@@ -1,7 +1,71 @@
+import os
+
 import pytest
 
-from adbtool import adbtool
+from adbtool import adbtool, cmd
 from adbtool.subcommands import adb as adbcommand
+
+
+def _clear_android_sdk_env(monkeypatch):
+    for env_var in cmd._ANDROID_SDK_ENV_VARS:
+        monkeypatch.delenv(env_var, raising=False)
+
+
+def test_android_home_uses_environment_variable_priority(monkeypatch):
+    monkeypatch.setenv("ANDROID_HOME", "android-home")
+    monkeypatch.setenv("ANDROID_SDK", "android-sdk")
+    monkeypatch.setenv("ANDROID_SDK_ROOT", "android-sdk-root")
+
+    assert cmd._get_android_home() == "android-home"
+
+    monkeypatch.delenv("ANDROID_HOME")
+    assert cmd._get_android_home() == "android-sdk"
+
+    monkeypatch.delenv("ANDROID_SDK")
+    assert cmd._get_android_home() == "android-sdk-root"
+
+
+def test_android_home_uses_existing_windows_default(monkeypatch):
+    _clear_android_sdk_env(monkeypatch)
+    monkeypatch.setattr(cmd.sys, "platform", "win32")
+    monkeypatch.setenv("LOCALAPPDATA", r"C:\Users\test\AppData\Local")
+    expected = os.path.join(r"C:\Users\test\AppData\Local", "Android", "Sdk")
+    monkeypatch.setattr(cmd.os.path, "isdir", lambda path: path == expected)
+
+    assert cmd._get_android_home() == expected
+
+
+def test_android_home_ignores_missing_windows_default(monkeypatch):
+    _clear_android_sdk_env(monkeypatch)
+    monkeypatch.setattr(cmd.sys, "platform", "win32")
+    monkeypatch.setenv("LOCALAPPDATA", r"C:\Users\test\AppData\Local")
+    monkeypatch.setattr(cmd.os.path, "isdir", lambda path: False)
+
+    assert cmd._get_android_home() is None
+
+
+def test_android_home_does_not_use_windows_default_on_other_platforms(monkeypatch):
+    _clear_android_sdk_env(monkeypatch)
+    monkeypatch.setattr(cmd.sys, "platform", "linux")
+    monkeypatch.setenv("LOCALAPPDATA", r"C:\Users\test\AppData\Local")
+
+    assert cmd._get_android_home() is None
+
+
+@pytest.mark.parametrize(
+    ("getter", "fallback"),
+    [
+        (cmd.getAdb, "adb"),
+        (cmd.getAapt, "aapt"),
+        (cmd.getZipalign, "zipalign"),
+        (cmd.getApksigner, "apksigner"),
+        (cmd.get_objdump, "objdump"),
+    ],
+)
+def test_android_tools_fall_back_to_path_without_sdk(monkeypatch, getter, fallback):
+    monkeypatch.setattr(cmd, "_get_android_home", lambda: None)
+
+    assert getter() == fallback
 
 
 def _mock_adb(monkeypatch, returncodes=None):
