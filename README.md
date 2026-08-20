@@ -10,7 +10,7 @@ A friendly android adb command-line tool
 * python 3.13+
 * uv
 * Android SDK (for APK/XAPK commands)
-* HarmonyOS/OpenHarmony SDK (for HAP installs)
+* HarmonyOS/OpenHarmony SDK (for HDC commands and HAP installs)
 
 
 ### Development
@@ -40,8 +40,9 @@ options:
   --version             show program's version number and exit
 
 sub commands:
-  {adb,devices,push,install,uninstall,apk,sign,ab,il2cpp}
+  {adb,hdc,devices,push,install,uninstall,apk,sign,ab,il2cpp}
     adb                 forward adb arguments to selected devices
+    hdc                 forward hdc arguments to selected devices
     devices             show android device list
     push                push files to android device
     install             install apk, xapk, or hap file
@@ -76,6 +77,33 @@ be placed after `--`.
 ~~~
 adbt adb -h
 usage: adbt adb [-h] [-d [DEVICE]] -- [adb_args ...]
+~~~
+
+---
+
+~~~
+adbt hdc -- shell
+adbt hdc -d 1 -- shell
+adbt hdc -d a -- shell pwd
+adbt hdc -d 1 -d serial-prefix -- shell
+adbt hdc -d 1,serial-prefix -- shell
+adbt hdc -- -h
+~~~
+
+`adbt hdc` uses the HDC target list and follows the same selection and argument
+forwarding rules as `adbt adb`.
+
+- `-d/--devices` before `--` selects HDC targets by index, serial prefix, or `a`
+- repeat `-d/--devices` or separate selectors with commas to select multiple targets
+- everything after `--` is passed to the real `hdc` binary without extra parsing
+- each selected target is invoked as `hdc -t <serial> ...`
+- `adbt hdc -h` shows the `adbt` subcommand help
+- `adbt hdc -- -h` shows the real `hdc` help
+- the HDC tool directory uses the top-level `hdc` setting in `adbtool.yml`
+
+~~~
+adbt hdc -h
+usage: adbt hdc [-h] [-d [DEVICE]] -- [hdc_args ...]
 ~~~
 
 ---
