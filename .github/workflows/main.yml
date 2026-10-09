@@ -15,14 +15,31 @@ jobs:
         - '3.13'
         - '3.14'
         - '3.15'
+        - '3.16'
 
     steps:
       - uses: actions/checkout@v6
+      # uv does not yet provide a Python 3.16 distribution; test CPython main.
+      - name: Build Python 3.16 from source
+        if: matrix.python-version == '3.16'
+        shell: bash
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y build-essential pkg-config libssl-dev zlib1g-dev libbz2-dev libreadline-dev libsqlite3-dev libffi-dev liblzma-dev libncurses-dev uuid-dev
+          git clone --depth 1 --branch main https://github.com/python/cpython.git "$RUNNER_TEMP/cpython"
+          git -C "$RUNNER_TEMP/cpython" rev-parse HEAD
+          cd "$RUNNER_TEMP/cpython"
+          ./configure --prefix="$RUNNER_TEMP/python-3.16" --without-ensurepip
+          make -j2
+          make install
+          "$RUNNER_TEMP/python-3.16/bin/python3.16" -c "import sys, ssl, bz2, lzma, sqlite3; assert sys.version_info[:2] == (3, 16); print(sys.version)"
       - name: Set up uv
         uses: astral-sh/setup-uv@v8.2.0
         with:
           enable-cache: true
-          python-version: ${{ matrix.python-version }}
+          python-version: ${{ matrix.python-version == '3.16' && format('{0}/python-3.16/bin/python3.16', runner.temp) || matrix.python-version }}
+      - name: Show Python version
+        run: uv run --no-project python --version
       - name: Install dependencies
         run: uv sync --frozen
       - name: Lint with Ruff
