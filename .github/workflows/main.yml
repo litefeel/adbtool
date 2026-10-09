@@ -19,6 +19,16 @@ jobs:
 
     steps:
       - uses: actions/checkout@v6
+      # Bootstrap the final release until uv's bundled download metadata catches up.
+      - name: Install Python 3.15 final
+        if: matrix.python-version == '3.15'
+        shell: bash
+        run: |
+          mkdir -p "$RUNNER_TEMP/python-3.15"
+          curl --fail --location --retry 3 --output "$RUNNER_TEMP/python-3.15.tar.gz" \
+            "https://github.com/astral-sh/python-build-standalone/releases/download/20261009/cpython-3.15.0%2B20261009-x86_64-unknown-linux-gnu-install_only_stripped.tar.gz"
+          tar -xzf "$RUNNER_TEMP/python-3.15.tar.gz" -C "$RUNNER_TEMP/python-3.15" --strip-components=1
+          "$RUNNER_TEMP/python-3.15/bin/python3.15" -c "import sys; assert sys.version_info[:3] == (3, 15, 0) and sys.version_info.releaselevel == 'final'; print(sys.version)"
       # uv does not yet provide a Python 3.16 distribution; test CPython main.
       - name: Build Python 3.16 from source
         if: matrix.python-version == '3.16'
@@ -37,7 +47,7 @@ jobs:
         uses: astral-sh/setup-uv@v8.2.0
         with:
           enable-cache: true
-          python-version: ${{ matrix.python-version == '3.16' && format('{0}/python-3.16/bin/python3.16', runner.temp) || matrix.python-version }}
+          python-version: ${{ matrix.python-version == '3.16' && format('{0}/python-3.16/bin/python3.16', runner.temp) || matrix.python-version == '3.15' && format('{0}/python-3.15/bin/python3.15', runner.temp) || matrix.python-version }}
       - name: Show Python version
         run: uv run --no-project python --version
       - name: Install dependencies
